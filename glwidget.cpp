@@ -12,15 +12,9 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 	m_voxelSpace = new Voxel::VoxelSpace(100,100,100,0);
 	m_voxelSpace->addBall(Voxel::Point(20,20,20),18);
 	m_voxelSpace->addBall(Voxel::Point(40,40,30),26);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,5),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,10),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,15),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,20),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,25),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,30),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,35),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,40),10);
-	m_voxelSpace->removeBall(Voxel::Point(30,30,45),10);
+	m_voxelSpace->removeCilinder(Voxel::Point(30,30,5),Voxel::Point(30,30,50),10);
+	m_voxelSpace->removeCilinder(Voxel::Point(40,40,30),Voxel::Point(90,15,5),10);
+
 	m_voxelSpace->triangulate();
 }
 

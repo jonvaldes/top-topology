@@ -108,6 +108,8 @@ namespace Voxel
 
 			void addBall(Point center, float diameter);
 			void removeBall(Point center, float diameter);
+			void removeCilinder(Point p1, Point p2, float radius);
+
 			std::set<Face> & triangulated(){return m_faces;}
 			std::set<Point> & triangulationPoints(){ return m_points;}
 			void triangulate();

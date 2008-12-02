@@ -65,6 +65,38 @@ void VoxelSpace::removeBall(Point center, float radius)
 					setPoint(Point(x,y,z), false);
 }
 
+void VoxelSpace::removeCilinder(Point p1, Point p2, float radius)
+{
+	for(int x = 0; x<m_spaceSize[0]; ++x)
+		for(int y = 0; y<m_spaceSize[1]; ++y)
+			for(int z = 0; z<m_spaceSize[2]; ++z)
+			{
+				// Calculamos el plano perpendicular a p1p2 que pasa por xyz
+				double a = p2.x() - p1.x();
+				double b = p2.y() - p1.y();
+				double c = p2.z() - p1.z();
+				double d = -(a*x + b*y +c*z);
+
+				// Calculamos la interseccion con p1p2
+				double t = (-d - a*p1.x() - b*p1.y() -c*p1.z()) / (a*(p2.x() - p1.x()) + b*(p2.y() - p1.y()) + c*(p2.z() - p1.z()));
+
+				Point p(0,0,0);
+				// Si 0<=t<=1, calculamos la distancia al punto interseccion
+				if(t>=0 && t<=1)
+					p = Point( p1.x() + t*(p2.x() - p1.x()), p1.y() + t*(p2.y() - p1.y()), p1.z() + t*(p2.z() - p1.z()));
+				// Si t>1 calculamos la distancia a p2
+				else if(t>1)
+					p = p2;
+				// Si no, calculamos la distancia a p1
+				else
+					p = p1;
+				// Si la distancia es menor o igual que radius, se vacia
+
+				if(p.distanceSquaredTo(Point(x,y,z))< radius*radius)
+					setPoint(Point(x,y,z), false);
+			}
+}
+
 int VoxelSpace::pointToIndex(Point p)
 {
 	return p[0] + p[1]*m_spaceSize[0] + p[2]*m_spaceSize[1]*m_spaceSize[0];
