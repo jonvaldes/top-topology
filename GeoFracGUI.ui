@@ -1,0 +1,464 @@
+<ui version="4.0" >
+ <class>GeoFracGUI</class>
+ <widget class="QMainWindow" name="GeoFracGUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>655</width>
+    <height>529</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>22</y>
+     <width>655</width>
+     <height>485</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_4" >
+    <item>
+     <widget class="QSplitter" name="splitter" >
+      <property name="orientation" >
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="GLWidget" native="1" name="widget" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget" >
+       <layout class="QVBoxLayout" name="verticalLayout_3" >
+        <item>
+         <widget class="QGroupBox" name="groupBox_2" >
+          <property name="title" >
+           <string>Selected Fractal:</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout" >
+           <item>
+            <widget class="QComboBox" name="comboBox" >
+             <property name="editable" >
+              <bool>false</bool>
+             </property>
+             <item>
+              <property name="text" >
+               <string>Mandelbrot</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Julia</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>Test</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title" >
+           <string>Fractal Properties</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2" >
+           <item>
+            <widget class="QLabel" name="label" >
+             <property name="text" >
+              <string>Light Speed:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout" >
+             <property name="spacing" >
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QSlider" name="horizontalSlider" >
+               <property name="minimum" >
+                <number>-100</number>
+               </property>
+               <property name="maximum" >
+                <number>100</number>
+               </property>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition" >
+                <enum>QSlider::TicksBelow</enum>
+               </property>
+               <property name="tickInterval" >
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinBox" >
+               <property name="minimum" >
+                <number>-100</number>
+               </property>
+               <property name="maximum" >
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_2" >
+             <property name="text" >
+              <string>Number of Iterations:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2" >
+             <property name="spacing" >
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_2" >
+               <property name="minimum" >
+                <number>0</number>
+               </property>
+               <property name="maximum" >
+                <number>5</number>
+               </property>
+               <property name="value" >
+                <number>0</number>
+               </property>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition" >
+                <enum>QSlider::TicksBelow</enum>
+               </property>
+               <property name="tickInterval" >
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinBox_2" >
+               <property name="minimum" >
+                <number>0</number>
+               </property>
+               <property name="maximum" >
+                <number>5</number>
+               </property>
+               <property name="value" >
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_3" >
+             <property name="text" >
+              <string>Gamma Value</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3" >
+             <property name="spacing" >
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_3" >
+               <property name="minimum" >
+                <number>1</number>
+               </property>
+               <property name="maximum" >
+                <number>80</number>
+               </property>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="tickPosition" >
+                <enum>QSlider::TicksBelow</enum>
+               </property>
+               <property name="tickInterval" >
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinBox_3" >
+               <property name="minimum" >
+                <number>1</number>
+               </property>
+               <property name="maximum" >
+                <number>80</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2" >
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0" >
+              <size>
+               <width>20</width>
+               <height>87</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton" >
+             <property name="text" >
+              <string>Toggle Show Cubes</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>655</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>507</y>
+     <width>655</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GLWidget</class>
+   <extends>QWidget</extends>
+   <header location="global" >glwidget.h</header>
+   <container>1</container>
+   <slots>
+    <slot>changeMorphSpeed(int)</slot>
+    <slot>centerFractal()</slot>
+    <slot>changeZoomValue(int)</slot>
+    <slot>changeFractalIterations(int)</slot>
+    <slot>setGammaValue(int)</slot>
+    <slot>setFractal(QString)</slot>
+    <signal>zoomValueChanged(int)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>widget</receiver>
+   <slot>changeMorphSpeed(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>556</x>
+     <y>191</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>228</x>
+     <y>118</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>556</x>
+     <y>191</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>625</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>625</x>
+     <y>193</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>556</x>
+     <y>191</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_2</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>560</x>
+     <y>258</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>625</x>
+     <y>260</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_2</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>625</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>560</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>widget</receiver>
+   <slot>changeFractalIterations(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>560</x>
+     <y>258</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>228</x>
+     <y>234</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>widget</receiver>
+   <slot>centerFractal()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>632</x>
+     <y>460</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>228</x>
+     <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_3</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>560</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>625</x>
+     <y>327</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_3</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>625</x>
+     <y>327</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>560</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider_3</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>widget</receiver>
+   <slot>setGammaValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>560</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>228</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>activated(QString)</signal>
+   <receiver>widget</receiver>
+   <slot>setFractal(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>397</x>
+     <y>79</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>228</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
