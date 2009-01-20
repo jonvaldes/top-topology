@@ -4,15 +4,10 @@
 #include <QGLWidget>
 #include <QTime>
 #include <vector>
-#include "voxelSpace.h"
+#include "voxel/voxelSpace.h"
 #include "glutil/FreeCamera.h"
 
 using namespace std;
-
-typedef struct
-{
-		float v[3];
-}Point;
 
 /** GLWidget*/
 class GLWidget : public QGLWidget
@@ -30,7 +25,6 @@ class GLWidget : public QGLWidget
     protected:
         void initializeGL();
         void paintGL();
-		void set2DCamera();
 		void resizeGL(int width, int height);
         void mousePressEvent(QMouseEvent *event);
         void mouseMoveEvent(QMouseEvent *event);
@@ -42,16 +36,11 @@ class GLWidget : public QGLWidget
         int widgetWidth;
         int widgetHeight;
 	
-		GLfloat rotX;
-		GLfloat rotY;
 		QPoint lastPos;
-		Point camPos;
-		double zoom;
 		Voxel::VoxelSpace * m_voxelSpace;
 		int lastButton;
 		bool m_wireframe;
 		bool m_showNonManifold;
-		//glutil::ShaderProgram * m_surfaceShader;
 		glutil::FreeCamera * m_camera;
 };
 

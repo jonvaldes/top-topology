@@ -1,9 +1,5 @@
 #include <QtGui>
-#include <QtOpenGL>
-
 #include <math.h>
-#include <iostream>
-#include <fstream>
 #include "glwidget.h"
 #include "PortableGL.h"
 
@@ -11,10 +7,6 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 {
 	m_voxelSpace = new Voxel::VoxelSpace(100,100,100,0);
 
-	/*
-	m_voxelSpace->addBall(Voxel::Point(20,20,20),0.5);
-	m_voxelSpace->addBall(Voxel::Point(21,21,20),0.5);
-	*/
 	m_voxelSpace->addBall(Voxel::Point(20,20,20),18);
 	m_voxelSpace->addBall(Voxel::Point(40,40,30),30);
 	m_voxelSpace->removeCilinder(Voxel::Point(30,30,5),Voxel::Point(30,30,50),10);
@@ -23,14 +15,10 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 
 	m_voxelSpace->addBall(Voxel::Point(65,65,65),20);
 
-//	m_voxelSpace->addBall(Voxel::Point(65,65,65),10);
-//	m_voxelSpace->removeBall(Voxel::Point(65,65,65),5);
-	
-	camPos.v[0] = 50;	camPos.v[1] = 50;	camPos.v[2] = 50;
 	m_camera = new glutil::FreeCamera(geom::Point3D(0,50,0), 0,0,45);
 
 	m_voxelSpace->triangulate();
-	lastButton = 0; // left button
+	lastButton = 0; 
 	m_wireframe = false;
 	m_showNonManifold = false;
 }
@@ -47,89 +35,73 @@ void GLWidget::initializeGL()
 
     glEnable(GL_DEPTH_TEST);
 
-	zoom = 1.0;
-	rotX = 0.0;
-	rotY = 0.0;
-
 }
 
 void GLWidget::paintGL()
 {
     makeCurrent();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    set2DCamera();
+
 	// Dibujamos todo el contenido
 	if(m_wireframe)
 	    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
 	glLoadIdentity();
 	m_camera->setAsGLCamera(widgetWidth,widgetHeight);
-	//glTranslatef(0.0,0.0,-10.0+zoom);
-
 	
 	std::set<Voxel::Face> & faces = m_voxelSpace->triangulated();
 	std::set<Voxel::Face>::iterator iter;
 	std::set<Voxel::Face>::iterator end = faces.end();
 	glBegin(GL_QUADS);
-	for(iter = faces.begin(); iter!=end;iter++)
 	{
-		const Voxel::Face &f = *iter;
-		glColor3f(f[0][0]/100.0,f[0][1]/100.0,f[0][2]/100.0);
-		glVertex3f(f[0][0],f[0][1],f[0][2]);
-		glVertex3f(f[1][0],f[1][1],f[1][2]);
-		glVertex3f(f[2][0],f[2][1],f[2][2]);
-		glVertex3f(f[3][0],f[3][1],f[3][2]);
+		for(iter = faces.begin(); iter!=end;iter++)
+		{
+			const Voxel::Face &f = *iter;
+			glColor3f(f[0][0]/100.0,f[0][1]/100.0,f[0][2]/100.0);
+			glVertex3f(f[0][0],f[0][1],f[0][2]);
+			glVertex3f(f[1][0],f[1][1],f[1][2]);
+			glVertex3f(f[2][0],f[2][1],f[2][2]);
+			glVertex3f(f[3][0],f[3][1],f[3][2]);
+		}
 	}
 	glEnd();
 	    
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	
-	std::vector<std::pair<Voxel::Point, Voxel::Point> > & points = m_voxelSpace->nonManifoldEdges();
-	
-	std::vector<std::pair<Voxel::Point, Voxel::Point> >::iterator iter2;
-	std::vector<std::pair<Voxel::Point, Voxel::Point> >::iterator end2 = points.end();
+
+	typedef std::vector<std::pair<Voxel::Point, Voxel::Point> > EdgesVec;
+
+	EdgesVec & points = m_voxelSpace->nonManifoldEdges();
+	EdgesVec::iterator iter2;
+	EdgesVec::iterator end2 = points.end();
 
 	if(m_showNonManifold)
 	{
 		glDisable(GL_DEPTH_TEST);
 		glBegin(GL_LINES);
-		glColor3f(1.0,1.0,1.0);
-		for(iter2 = points.begin(); iter2!=end2;++iter2)
 		{
-			Voxel::Point p1 = iter2->first;
-			Voxel::Point p2 = iter2->second;
-			glVertex3f(p1.x(),p1.y(),p1.z());
-			glVertex3f(p2.x(),p2.y(),p2.z());
+			glColor3f(1.0,1.0,1.0);
+			for(iter2 = points.begin(); iter2!=end2;++iter2)
+			{
+				Voxel::Point p1 = iter2->first;
+				Voxel::Point p2 = iter2->second;
+				glVertex3f(p1.x(),p1.y(),p1.z());
+				glVertex3f(p2.x(),p2.y(),p2.z());
+			}
 		}
-
 		glEnd();
 		glEnable(GL_DEPTH_TEST);
 	}
-	
-}
-
-void GLWidget::set2DCamera()
-{
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	glEnable(GL_DEPTH_TEST);
-	gluPerspective (45.0, (GLfloat)widgetWidth/(GLfloat)widgetHeight, 0.1, 500.0);
-	glMatrixMode (GL_MODELVIEW);
 }
 
 void GLWidget::resizeGL(int width, int height)
 {
     widgetWidth = width;
     widgetHeight = height;
-    //int side = qMin(width, height);
     glViewport(0, 0, width, height);
-
-    set2DCamera();
 }
 
 void GLWidget::wheelEvent(QWheelEvent * event)
 {
-	//zoom+=event->delta()/100.0;
 	m_camera->advance(event->delta()/100.0);
     updateGL();
 }
@@ -169,17 +141,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 	if(lastButton == 1)
 	{
-		//camPos.v[0]-= dx/10.0;
-		//camPos.v[1]+= dy/10.0;	
 		m_camera->strafeLeft(dx/10.0);
 		m_camera->moveUp(dy/10.0);
 	}
 	else
-	{
-	//	rotX-=dx/2.0;
-	//	rotY+=dy/2.0;
 		m_camera->mouseLookTurn(dx/60.0,dy/60.0);
-	}
 
     updateGL();
 }

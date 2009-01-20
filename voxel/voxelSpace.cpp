@@ -21,13 +21,6 @@ VoxelSpace::~VoxelSpace()
 	delete m_space;
 }
 
-float Point::distanceSquaredTo(const Point &p) const
-{
-	return	(v[0]-p.v[0]) * (v[0]-p.v[0]) +
-			(v[1]-p.v[1]) * (v[1]-p.v[1]) +
-			(v[2]-p.v[2]) * (v[2]-p.v[2]);
-}
-
 void VoxelSpace::addBall(Point center, float radius)
 {
 	int maxRadius = ceil(radius);
@@ -38,20 +31,6 @@ void VoxelSpace::addBall(Point center, float radius)
 			for(int z = center[2]-maxRadius; z<center[2]+maxRadius; ++z)
 				if(center.distanceSquaredTo(Point(x,y,z)) <= maxDistSquared)
 					setPoint(Point(x,y,z), true);
-	/*	
-	for(int z=0; z<m_spaceSize[2]; ++z)
-	{
-		for(int y=0; y<m_spaceSize[1]; ++y)
-		{
-			for(int x=0; x<m_spaceSize[0]; ++x)
-			{
-				printf("%s",getPoint(Point(x,y,z))?"X":"-");
-			}
-			printf("\n");
-		}
-		printf("\n\n\n");
-	}
-*/
 }
 
 void VoxelSpace::removeBall(Point center, float radius)
