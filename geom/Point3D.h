@@ -2,7 +2,6 @@
 #define POINT_3D_H
 #define SQR(X) ((X)*(X))
 
-#include "Vector3D.h"
 #include <math.h>
 #include "../util/NTuple.h"
 namespace geom
@@ -44,7 +43,7 @@ namespace geom
             Point3D operator+(const Vector3D &v) const;
 
 			/** Gets the vector from this point to the point p*/
-            inline Vector3D operator-(const Point3D& p) const{return Vector3D( x-p.x, y-p.y, z-p.z);}
+            Vector3D operator-(const Point3D& p) const;
 
 
             /** Checks if this point is equal to the given one

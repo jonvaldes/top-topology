@@ -156,7 +156,6 @@ void GLWidget::keyPressEvent ( QKeyEvent * event )
 
 	if(event->key() == Qt::Key_D)
 		m_camera->strafeRight(1.0);
-	printf("MOVED\n");
 
     updateGL();
 }

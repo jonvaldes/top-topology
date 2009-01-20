@@ -1,5 +1,6 @@
 #include "Point3D.h"
-#include <math.h>
+#include "Vector3D.h"
+#include <cmath>
 
 using namespace geom;
 
@@ -23,4 +24,11 @@ Point3D Point3D::operator+(const Vector3D &v) const
 {
     return Point3D(x+v.dx, y+v.dy, z+v.dz);
 }
+
+Vector3D Point3D::operator-(const Point3D &p) const
+{
+	return Vector3D( x-p.x, y-p.y, z-p.z);
+}
+
+
 
