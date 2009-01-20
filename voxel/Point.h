@@ -20,7 +20,12 @@ namespace Voxel
 			float & y(){return v[1];}
 			float & z(){return v[2];}
 
-			float distanceSquaredTo(const Point &p) const;
+			float distanceSquaredTo(const Point &p) const
+			{
+				return ( (x()-p.x()) * (x()-p.x()) +
+					(y()-p.y()) * (y()-p.y()) +
+					(z()-p.z()) * (z()-p.z()) );
+			}
 
 			bool operator==(const Point &p) const
 			{

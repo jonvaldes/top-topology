@@ -15,7 +15,7 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 
 	m_voxelSpace->addBall(Voxel::Point(65,65,65),20);
 
-	m_camera = new glutil::FreeCamera(geom::Point3D(0,50,0), 0,0,45);
+	m_camera = new glutil::FreeCamera(geom::Point3D(-100,100,0), M_PI_2,M_PI_4,60);
 
 	m_voxelSpace->triangulate();
 	lastButton = 0; 

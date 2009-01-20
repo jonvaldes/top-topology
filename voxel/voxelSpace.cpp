@@ -21,7 +21,7 @@ VoxelSpace::~VoxelSpace()
 	delete m_space;
 }
 
-void VoxelSpace::addBall(Point center, float radius)
+void VoxelSpace::setBall(Point center, float radius,bool value)
 {
 	int maxRadius = ceil(radius);
 	float maxDistSquared = radius*radius;
@@ -30,19 +30,7 @@ void VoxelSpace::addBall(Point center, float radius)
 		for(int y = center[1]-maxRadius; y<center[1]+maxRadius; ++y)
 			for(int z = center[2]-maxRadius; z<center[2]+maxRadius; ++z)
 				if(center.distanceSquaredTo(Point(x,y,z)) <= maxDistSquared)
-					setPoint(Point(x,y,z), true);
-}
-
-void VoxelSpace::removeBall(Point center, float radius)
-{
-	int maxRadius = ceil(radius);
-	float maxDistSquared = radius*radius;
-	
-	for(int x = center[0]-maxRadius; x<center[0]+maxRadius; ++x)
-		for(int y = center[1]-maxRadius; y<center[1]+maxRadius; ++y)
-			for(int z = center[2]-maxRadius; z<center[2]+maxRadius; ++z)
-				if(center.distanceSquaredTo(Point(x,y,z)) <= maxDistSquared)
-					setPoint(Point(x,y,z), false);
+					setVoxel(Point(x,y,z), value);
 }
 
 void VoxelSpace::removeNonConnected() // this tries to remove non-manifold-surface-creating cubes
@@ -51,25 +39,25 @@ void VoxelSpace::removeNonConnected() // this tries to remove non-manifold-surfa
 		for(size_t y=0;y<m_spaceSize[2];++y)
 			for(size_t x=0;x<m_spaceSize[0];++x)
 			{
-				bool value      = getPoint(x,y,z);
-				bool valueUp    = getPoint(x,y-1,z);
-				bool valueDown  = getPoint(x,y+1,z);
-				bool valueLeft  = getPoint(x-1,y,z);
-				bool valueRight = getPoint(x+1,y,z);
-				bool valueFront = getPoint(x,y,z-1);
-				bool valueBack  = getPoint(x,y,z+1);
+				bool value      = getVoxel(x,y,z);
+				bool valueUp    = getVoxel(x,y-1,z);
+				bool valueDown  = getVoxel(x,y+1,z);
+				bool valueLeft  = getVoxel(x-1,y,z);
+				bool valueRight = getVoxel(x+1,y,z);
+				bool valueFront = getVoxel(x,y,z-1);
+				bool valueBack  = getVoxel(x,y,z+1);
 
 				bool anyTrue = valueUp || valueDown || valueLeft || valueRight || valueFront || valueBack;
 				bool anyFalse= !valueUp || !valueDown || !valueLeft || !valueRight || !valueFront || !valueBack;
 
 				if(value && !anyTrue)
-					setPoint(Point(x,y,z),false);
+					setVoxel(Point(x,y,z),false);
 				else if(!value && !anyFalse)
-					setPoint(Point(x,y,z),true);
+					setVoxel(Point(x,y,z),true);
 			}
 }
 
-void VoxelSpace::removeCilinder(Point p1, Point p2, float radius)
+void VoxelSpace::setCilinder(Point p1, Point p2, float radius, bool value)
 {
 	for(unsigned int x = 0; x<m_spaceSize[0]; ++x)
 		for(unsigned int y = 0; y<m_spaceSize[1]; ++y)
@@ -97,7 +85,7 @@ void VoxelSpace::removeCilinder(Point p1, Point p2, float radius)
 				// Si la distancia es menor o igual que radius, se vacia
 
 				if(p.distanceSquaredTo(Point(x,y,z))< radius*radius)
-					setPoint(Point(x,y,z), false);
+					setVoxel(Point(x,y,z), value);
 			}
 }
 
@@ -116,7 +104,7 @@ Point VoxelSpace::indexToPoint(int index)
 	return p;
 }
 
-void VoxelSpace::setPoint(Point p, bool value)
+void VoxelSpace::setVoxel(Point p, bool value)
 {
 	if(p.x() < 0 || p.y()<0 || p.z()<0)
 		return;
@@ -125,20 +113,18 @@ void VoxelSpace::setPoint(Point p, bool value)
 	m_space[pointToIndex(p)] = value;
 }
 
-bool VoxelSpace::getPoint(Point p)
+bool VoxelSpace::getVoxel(Point p)
 {
-	if(p[0]<0 || p[1]<0 || p[2]<0)
-		return false;
-
-	if(p[0]>=(int)m_spaceSize[0] || p[1] >=(int)m_spaceSize[1] || p[2]>=(int)m_spaceSize[2])
-		return false;
+	for(int i=0;i<3;++i)
+		if(p[i]<0 || p[i]>=(int)m_spaceSize[i])
+			return false; // all voxels outside the volume are empty
 
 	return m_space[pointToIndex(p)];
 }
 
-bool VoxelSpace::getPoint(int x, int y, int z)
+bool VoxelSpace::getVoxel(int x, int y, int z)
 {
-	return getPoint(Point(x,y,z));
+	return getVoxel(Point(x,y,z));
 }
 
 uint64_t VoxelSpace::getIntFromSurfacePoint(const Point& p)
@@ -162,13 +148,13 @@ Point VoxelSpace::getSurfacePointFromInt(uint64_t i)
 
 bool VoxelSpace::isBorder(int x,int y,int z)
 {
-	if(!getPoint(x,y,z))
+	if(!getVoxel(x,y,z))
 		return false;
 	int offsets[6][3] = {{-1,0,0}, {1,0,0}, {0,-1,0},{0,1,0},{0,0,-1},{0,0,1}};
 
 	for(int i=0;i<6;++i)
 	{
-		if(!getPoint(x+offsets[i][0], y+offsets[i][1], z+offsets[i][2]))
+		if(!getVoxel(x+offsets[i][0], y+offsets[i][1], z+offsets[i][2]))
 		{
 			return true;
 		}
@@ -199,33 +185,18 @@ void VoxelSpace::triangulate()
 			for(int z=-1;z<=(int)m_spaceSize[2]+1; ++z)
 			{
 				bool facesToAdd[3] = {false,false,false};
-				/*
-				if(getPoint(x,y,z))
+				
+				if(getVoxel(x,y,z)) // El voxel actual esta lleno
 				{
-					int offsets[17][3] = {{-1,-1,0}, {-1,0,-1},{-1,0,0}, {-1,0,1}, {-1,1,0}, 
-						{0,-1,-1}, {0,-1,0}, {0,0,-1}, {0,0,1}, {0,1,-1}, {0,1,0}, {0,1,1}, 
-						{1,-1,0}, {1,0,-1}, {1,0,0}, {1,0,1}, {1,1,0}};
-				 //	int offsets[6][3] = {{-1,0,0}, {1,0,0}, {0,-1,0},{0,1,0},{0,0,-1},{0,0,1}};
-					
-					if(isBorder(x,y,z))
-					{
-						for(int i=0;i<17;++i)
-							if(isBorder(x+offsets[i][0], y+offsets[i][1], z+offsets[i][2]))
-								m_edges.push_back(std::pair<Point,Point>(Point(x+0.5,y+0.5,z+0.5), Point(x+offsets[i][0]+0.5, y+offsets[i][1]+0.5, z+offsets[i][2]+0.5)));
-					}
-				}
-				*/
-				if(getPoint(x,y,z)) // El voxel actual esta lleno
-				{
-					if(!getPoint(x-1,y,z)) facesToAdd[0] = true; // Pero los anteriores estaban vacios
-					if(!getPoint(x,y-1,z)) facesToAdd[1] = true;
-					if(!getPoint(x,y,z-1)) facesToAdd[2] = true;
+					if(!getVoxel(x-1,y,z)) facesToAdd[0] = true; // Pero los anteriores estaban vacios
+					if(!getVoxel(x,y-1,z)) facesToAdd[1] = true;
+					if(!getVoxel(x,y,z-1)) facesToAdd[2] = true;
 				}
 				else	// El voxel actual esta lleno
 				{	
-					if(getPoint(x-1,y,z)) facesToAdd[0] = true; // Pero los anteriores estaban vacios
-					if(getPoint(x,y-1,z)) facesToAdd[1] = true;
-					if(getPoint(x,y,z-1)) facesToAdd[2] = true;
+					if(getVoxel(x-1,y,z)) facesToAdd[0] = true; // Pero los anteriores estaban vacios
+					if(getVoxel(x,y-1,z)) facesToAdd[1] = true;
+					if(getVoxel(x,y,z-1)) facesToAdd[2] = true;
 				}
 				//if(facesToAdd[0] || facesToAdd[1] || facesToAdd[2])
 				//	printf("Faces: point: %i,%i,%i, faces:%i,%i,%i\n", x,y,z, facesToAdd[0],facesToAdd[1], facesToAdd[2]);

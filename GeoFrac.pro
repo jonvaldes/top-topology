@@ -14,7 +14,6 @@ HEADERS += GeoFracGUI.h \
 SOURCES += main.cpp \
 	GeoFracGUI.cpp \
 	voxel/voxelSpace.cpp \
-	voxiel/Point.cpp \
 	glutil/FreeCamera.cpp \
 	geom/Point3D.cpp \
 	geom/Vector3D.cpp \
