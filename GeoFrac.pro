@@ -18,6 +18,9 @@ SOURCES += main.cpp \
 	shaderUtils.cpp \
 	GeoFracGUI.cpp \
 	voxelSpace.cpp \
+	glutil/FreeCamera.cpp \
+	geom/Point3D.cpp \
+	geom/Vector3D.cpp \
 	glwidget.cpp 
 
 FORMS           = GeoFracGUI.ui

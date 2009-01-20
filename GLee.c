@@ -1,3 +1,4 @@
+#ifndef __APPLE__
 /***************************************************************************
 *
 * GLee.c
@@ -12970,3 +12971,5 @@ GLEE_EXTERN GLboolean GLeeInit()
     __GLeeExtList_clean(&extensionNames);
     return GL_TRUE;
 }
+
+#endif

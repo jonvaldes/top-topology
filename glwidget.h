@@ -5,15 +5,9 @@
 #include <QTime>
 #include <vector>
 #include "voxelSpace.h"
+#include "glutil/FreeCamera.h"
 
 using namespace std;
-
-struct glut_timer_t
-{
-	QTime current_time;
-	QTime last_time;
-	float animationTimeValue;
-};
 
 typedef struct
 {
@@ -30,15 +24,8 @@ class GLWidget : public QGLWidget
         ~GLWidget();
 
     public slots:
-		void changeMorphSpeed(int newSpeed);
-		void centerFractal();
-		void changeZoomValue(int newZoom);
-		void changeFractalIterations(int iters);
-		void setGammaValue(int gamma);
-		void setFractal(QString fractal);
-		void setShowCube(int doShow);
-    signals:
-		void zoomValueChanged(int newZoom);
+		void setWireframe(bool showWire);
+		void setShowNonManifold(bool showEdges);
 
     protected:
         void initializeGL();
@@ -49,9 +36,6 @@ class GLWidget : public QGLWidget
         void mouseMoveEvent(QMouseEvent *event);
         void wheelEvent(QWheelEvent * event);
         void keyPressEvent ( QKeyEvent * event );
-		void timerEvent(QTimerEvent * event);
-		void computeCube(vector<Point> * v, float cx, float cy, float cz, double side, int iterations);
-		void generateVBO(vector<Point>*p);
 
 	
     private:
@@ -61,16 +45,14 @@ class GLWidget : public QGLWidget
 		GLfloat rotX;
 		GLfloat rotY;
 		QPoint lastPos;
-		GLuint shaderProgram;
-		GLint cubeSizeLoc;
-		int mustShowCube;
+		Point camPos;
 		double zoom;
-		float morphSpeed;
-		glut_timer_t timer;
-		int fractalIterations; 
-		GLuint vbufferID;
-		int numPointsInVBO;
 		Voxel::VoxelSpace * m_voxelSpace;
+		int lastButton;
+		bool m_wireframe;
+		bool m_showNonManifold;
+		//glutil::ShaderProgram * m_surfaceShader;
+		glutil::FreeCamera * m_camera;
 };
 
 #endif /*GLWIDGET_H*/

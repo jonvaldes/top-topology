@@ -33,6 +33,8 @@
 *
 ***************************************************************************/
 
+#ifndef __APPLE__
+
 #ifndef __glee_h_
 #define __glee_h_
 
@@ -12444,3 +12446,5 @@ GLEE_EXTERN const char * GLeeGetExtStrGLX();
 #endif
 
 #endif /* __glee_h_ defined */
+
+#endif /* __APPLE__ */
