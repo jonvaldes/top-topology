@@ -37,7 +37,7 @@ class GLWidget : public QGLWidget
         int widgetHeight;
 	
 		QPoint lastPos;
-		Voxel::VoxelSpace * m_voxelSpace;
+		voxel::VoxelSpace * m_voxelSpace;
 		int lastButton;
 		bool m_wireframe;
 		bool m_showNonManifold;

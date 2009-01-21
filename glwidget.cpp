@@ -5,15 +5,15 @@
 
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 {
-	m_voxelSpace = new Voxel::VoxelSpace(100,100,100,0);
+	m_voxelSpace = new voxel::VoxelSpace(100,100,100,0);
 
-	m_voxelSpace->addBall(Voxel::Point(20,20,20),18);
-	m_voxelSpace->addBall(Voxel::Point(40,40,30),30);
-	m_voxelSpace->removeCilinder(Voxel::Point(30,30,5),Voxel::Point(30,30,50),10);
-	m_voxelSpace->removeCilinder(Voxel::Point(40,40,30),Voxel::Point(90,15,5),10);
-	m_voxelSpace->removeCilinder(Voxel::Point(40,40,35),Voxel::Point(-90,-15,5),10);
+	m_voxelSpace->addBall(voxel::Point(20,20,20),18);
+	m_voxelSpace->addBall(voxel::Point(40,40,30),30);
+	m_voxelSpace->removeCilinder(voxel::Point(30,30,5),voxel::Point(30,30,50),10);
+	m_voxelSpace->removeCilinder(voxel::Point(40,40,30),voxel::Point(90,15,5),10);
+	m_voxelSpace->removeCilinder(voxel::Point(40,40,35),voxel::Point(-90,-15,5),10);
 
-	m_voxelSpace->addBall(Voxel::Point(65,65,65),20);
+	m_voxelSpace->addBall(voxel::Point(65,65,65),20);
 
 	m_camera = new glutil::FreeCamera(geom::Point3D(-100,100,0), M_PI_2,M_PI_4,60);
 
@@ -49,14 +49,14 @@ void GLWidget::paintGL()
 	glLoadIdentity();
 	m_camera->setAsGLCamera(widgetWidth,widgetHeight);
 	
-	std::set<Voxel::Face> & faces = m_voxelSpace->triangulated();
-	std::set<Voxel::Face>::iterator iter;
-	std::set<Voxel::Face>::iterator end = faces.end();
+	std::set<voxel::Face> & faces = m_voxelSpace->triangulated();
+	std::set<voxel::Face>::iterator iter;
+	std::set<voxel::Face>::iterator end = faces.end();
 	glBegin(GL_QUADS);
 	{
 		for(iter = faces.begin(); iter!=end;iter++)
 		{
-			const Voxel::Face &f = *iter;
+			const voxel::Face &f = *iter;
 			glColor3f(f[0][0]/100.0,f[0][1]/100.0,f[0][2]/100.0);
 			glVertex3f(f[0][0],f[0][1],f[0][2]);
 			glVertex3f(f[1][0],f[1][1],f[1][2]);
@@ -68,7 +68,7 @@ void GLWidget::paintGL()
 	    
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 
-	typedef std::vector<std::pair<Voxel::Point, Voxel::Point> > EdgesVec;
+	typedef std::vector<std::pair<voxel::Point, voxel::Point> > EdgesVec;
 
 	EdgesVec & points = m_voxelSpace->nonManifoldEdges();
 	EdgesVec::iterator iter2;
@@ -82,8 +82,8 @@ void GLWidget::paintGL()
 			glColor3f(1.0,1.0,1.0);
 			for(iter2 = points.begin(); iter2!=end2;++iter2)
 			{
-				Voxel::Point p1 = iter2->first;
-				Voxel::Point p2 = iter2->second;
+				voxel::Point p1 = iter2->first;
+				voxel::Point p2 = iter2->second;
 				glVertex3f(p1.x(),p1.y(),p1.z());
 				glVertex3f(p2.x(),p2.y(),p2.z());
 			}

@@ -4,7 +4,7 @@
 #include <cmath>
 #include <stdio.h>
 
-using namespace Voxel;
+using namespace voxel;
 
 VoxelSpace::VoxelSpace(int widthVoxels, int heightVoxels, int depthVoxels, bool defaultValue)
 {
@@ -30,33 +30,10 @@ void VoxelSpace::setBall(Point center, float radius,bool value)
 		for(int y = center[1]-maxRadius; y<center[1]+maxRadius; ++y)
 			for(int z = center[2]-maxRadius; z<center[2]+maxRadius; ++z)
 				if(center.distanceSquaredTo(Point(x,y,z)) <= maxDistSquared)
-					setVoxel(Point(x,y,z), value);
+					setVoxel(Voxel(x,y,z), value);
 }
 
-void VoxelSpace::removeNonConnected() // this tries to remove non-manifold-surface-creating cubes
-{
-	for(size_t z=0;z<m_spaceSize[2];++z)
-		for(size_t y=0;y<m_spaceSize[2];++y)
-			for(size_t x=0;x<m_spaceSize[0];++x)
-			{
-				bool value      = getVoxel(x,y,z);
-				bool valueUp    = getVoxel(x,y-1,z);
-				bool valueDown  = getVoxel(x,y+1,z);
-				bool valueLeft  = getVoxel(x-1,y,z);
-				bool valueRight = getVoxel(x+1,y,z);
-				bool valueFront = getVoxel(x,y,z-1);
-				bool valueBack  = getVoxel(x,y,z+1);
-
-				bool anyTrue = valueUp || valueDown || valueLeft || valueRight || valueFront || valueBack;
-				bool anyFalse= !valueUp || !valueDown || !valueLeft || !valueRight || !valueFront || !valueBack;
-
-				if(value && !anyTrue)
-					setVoxel(Point(x,y,z),false);
-				else if(!value && !anyFalse)
-					setVoxel(Point(x,y,z),true);
-			}
-}
-
+/* It doesn't really set cilinders, but capsules */
 void VoxelSpace::setCilinder(Point p1, Point p2, float radius, bool value)
 {
 	for(unsigned int x = 0; x<m_spaceSize[0]; ++x)
@@ -83,48 +60,47 @@ void VoxelSpace::setCilinder(Point p1, Point p2, float radius, bool value)
 				else
 					p = p1;
 				// Si la distancia es menor o igual que radius, se vacia
-
 				if(p.distanceSquaredTo(Point(x,y,z))< radius*radius)
-					setVoxel(Point(x,y,z), value);
+					setVoxel(Voxel(x,y,z), value);
 			}
 }
 
-int VoxelSpace::pointToIndex(Point p)
+int VoxelSpace::voxelToIndex(Voxel v)
 {
-	return p[0] + p[1]*m_spaceSize[0] + p[2]*m_spaceSize[1]*m_spaceSize[0];
+	return v[0] + v[1]*m_spaceSize[0] + v[2]*m_spaceSize[1]*m_spaceSize[0];
 }
 
-Point VoxelSpace::indexToPoint(int index)
+Voxel VoxelSpace::indexToVoxel(int index)
 {
-	Point p(0,0,0);
-	p[2] = index / (m_spaceSize[0]*m_space[1]);
+	Voxel v(0,0,0);
+	v[2] = index / (m_spaceSize[0]*m_space[1]);
 	int indexMinusZ = index % (m_spaceSize[0] * m_spaceSize[1]);
-	p[1] = indexMinusZ % m_spaceSize[0];
-	p[0] = indexMinusZ / m_spaceSize[0];
-	return p;
+	v[1] = indexMinusZ % m_spaceSize[0];
+	v[0] = indexMinusZ / m_spaceSize[0];
+	return v;
 }
 
-void VoxelSpace::setVoxel(Point p, bool value)
-{
-	if(p.x() < 0 || p.y()<0 || p.z()<0)
-		return;
-	if(p.x() >= m_spaceSize[0] || p.y() >= m_spaceSize[1] || p.z() >=m_spaceSize[2])
-		return;
-	m_space[pointToIndex(p)] = value;
-}
-
-bool VoxelSpace::getVoxel(Point p)
+void VoxelSpace::setVoxel(Voxel v, bool value)
 {
 	for(int i=0;i<3;++i)
-		if(p[i]<0 || p[i]>=(int)m_spaceSize[i])
+		if(v[i]<0 || v[i]>=(int)m_spaceSize[i])
+			return;
+
+	m_space[voxelToIndex(v)] = value;
+}
+
+bool VoxelSpace::getVoxel(Voxel v)
+{
+	for(int i=0;i<3;++i)
+		if(v[i]<0 || v[i]>=(int)m_spaceSize[i])
 			return false; // all voxels outside the volume are empty
 
-	return m_space[pointToIndex(p)];
+	return m_space[voxelToIndex(v)];
 }
 
 bool VoxelSpace::getVoxel(int x, int y, int z)
 {
-	return getVoxel(Point(x,y,z));
+	return getVoxel(Voxel(x,y,z));
 }
 
 uint64_t VoxelSpace::getIntFromSurfacePoint(const Point& p)
@@ -164,9 +140,6 @@ bool VoxelSpace::isBorder(int x,int y,int z)
 
 void VoxelSpace::triangulate()
 {	
-
-	this->removeNonConnected();
-
 	std::map<uint64_t, int> edges;
 	/* Conversion xyz --> int
 		La idea es convertir una coordenada xyz en un entero, como si estuvieramos 

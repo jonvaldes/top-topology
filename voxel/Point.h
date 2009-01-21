@@ -5,7 +5,7 @@
 //#include <stdint.h>
 using namespace util;
 
-namespace Voxel
+namespace voxel
 {
 	class Point : public Triplet<float>
 	{

@@ -7,7 +7,7 @@
 
 using namespace util;
 
-namespace Voxel
+namespace voxel
 {
 	class Face : public NTuple <Point,4>
 	{

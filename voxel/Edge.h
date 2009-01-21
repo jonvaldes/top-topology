@@ -3,7 +3,7 @@
 
 //#include "Point.h"
 #include <stdint.h>
-namespace Voxel
+namespace voxel
 {
 	class Edge
 	{
