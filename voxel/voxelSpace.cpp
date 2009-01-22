@@ -11,6 +11,15 @@ VoxelSpace::VoxelSpace(int widthVoxels, int heightVoxels, int depthVoxels, bool 
 	m_spaceSize[0] = widthVoxels;
 	m_spaceSize[1] = heightVoxels;
 	m_spaceSize[2] = depthVoxels;
+
+	for(int i=0;i<3;++i)
+		if(m_spaceSize[i] > 100)
+		{
+			printf("ERROR: Space size > 100, voxels won't work with that value unless their code is changed\n");
+			exit(-1);
+		}
+
+
 	m_space = new bool[widthVoxels * heightVoxels * depthVoxels];
 	for(int i=0;i<widthVoxels*heightVoxels*depthVoxels; ++i)
 		m_space[i] = defaultValue;
@@ -158,21 +167,11 @@ void VoxelSpace::triangulate()
 			for(int z=-1;z<=(int)m_spaceSize[2]+1; ++z)
 			{
 				bool facesToAdd[3] = {false,false,false};
-				
-				if(getVoxel(x,y,z)) // El voxel actual esta lleno
-				{
-					if(!getVoxel(x-1,y,z)) facesToAdd[0] = true; // Pero los anteriores estaban vacios
-					if(!getVoxel(x,y-1,z)) facesToAdd[1] = true;
-					if(!getVoxel(x,y,z-1)) facesToAdd[2] = true;
-				}
-				else	// El voxel actual esta lleno
-				{	
-					if(getVoxel(x-1,y,z)) facesToAdd[0] = true; // Pero los anteriores estaban vacios
-					if(getVoxel(x,y-1,z)) facesToAdd[1] = true;
-					if(getVoxel(x,y,z-1)) facesToAdd[2] = true;
-				}
-				//if(facesToAdd[0] || facesToAdd[1] || facesToAdd[2])
-				//	printf("Faces: point: %i,%i,%i, faces:%i,%i,%i\n", x,y,z, facesToAdd[0],facesToAdd[1], facesToAdd[2]);
+				bool current = getVoxel(x,y,z);
+
+				if(current != getVoxel(x-1,y,z)) facesToAdd[0] = true; 
+				if(current != getVoxel(x,y-1,z)) facesToAdd[1] = true;
+				if(current != getVoxel(x,y,z-1)) facesToAdd[2] = true;
 
 				if(facesToAdd[0]) // Anyadimos la cara de la izda
 				{
@@ -192,7 +191,9 @@ void VoxelSpace::triangulate()
 					edges[Edge(ip1,Edge::DIR_Y).getID()]++;
 					edges[Edge(ip3,Edge::DIR_Z).getID()]++;
 
-					m_faces.insert(Face(p1,p2,p3,p4));
+					Face f(p1,p2,p3,p4);
+					f.normal[0] = -1, f.normal[1] = 0, f.normal[2] = 0;
+					m_faces.insert(f);
 				}
 				if(facesToAdd[1]) // Anyadimos la cara del frente
 				{
@@ -212,8 +213,10 @@ void VoxelSpace::triangulate()
 					edges[Edge(ip1,Edge::DIR_Z).getID()]++;
 					edges[Edge(ip2,Edge::DIR_Z).getID()]++;
 					edges[Edge(ip4,Edge::DIR_X).getID()]++;
-					
-					m_faces.insert(Face(p1,p2,p3,p4));
+				
+					Face f(p1,p2,p3,p4);
+					f.normal[0] = 0, f.normal[1] = 0, f.normal[2] = 1;
+					m_faces.insert(f);
 		
 				}
 				if(facesToAdd[2]) // Anyadimos la cara de arriba
@@ -235,14 +238,26 @@ void VoxelSpace::triangulate()
 					edges[Edge(ip4,Edge::DIR_X).getID()]++;
 					edges[Edge(ip2,Edge::DIR_Y).getID()]++;
 
-					m_faces.insert(Face(p1,p2,p3,p4));
+
+					Face f(p1,p2,p3,p4);
+					f.normal[0] = 0, f.normal[1] = 1, f.normal[2] = 0;
+					m_faces.insert(f);
 				}
 			}
 
-	printf("Num points: %i\n",(int) m_points.size());
-	printf("Num edges: %i\n", (int) edges.size());
-	printf("Num faces: %i\n", (int) m_faces.size());
-	printf("Euler characteristic: %li\n", (long int)m_points.size() - (long int)edges.size() + (long int)m_faces.size());
+	int numPoints = m_points.size();
+	int numEdges = edges.size();
+	int numFaces = m_faces.size();
+	int numVolumes = countVolumes();
+	int numComponents = countComponents();
+	int numHoles =(-numComponents + numPoints - numEdges + numFaces - numVolumes)/-2; 
+
+	printf("Num components: %i\n", numComponents);
+	printf("Num points: %i\n", numPoints);
+	printf("Num edges: %i\n", numEdges);
+	printf("Num faces: %i\n", numFaces);
+	printf("Num volumes: %i\n",numVolumes);
+	printf("Number of holes: %i\n",numHoles );
 
 	std::map<uint64_t,int>::iterator it;
 	std::map<uint64_t,int>::iterator end = edges.end();
@@ -267,3 +282,102 @@ void VoxelSpace::triangulate()
 		}
 	}
 }
+
+/* empties the volume of voxels of wich 'v' forms part */
+void VoxelSpace::emptyVolume(Voxel v)
+{
+	std::set<Voxel> toRemoveNow;
+	std::set<Voxel> toRemoveNext;
+	toRemoveNow.insert(v);
+
+	while(toRemoveNow.size() > 0)
+	{
+		std::set<Voxel>::iterator it = toRemoveNow.begin();
+		std::set<Voxel>::iterator end= toRemoveNow.end();
+		for(;it!=end;++it)
+		{
+			const Voxel &vnow = *it;
+			setVoxel(vnow,false);
+			int offsetTable[] = {-1,0,0,	1,0,0,		0,-1,0,		0,1,0,		0,0,-1,		0,0,1};
+			for(int o=0;o<6;++o)
+			{
+				int * offset = offsetTable + 3*o;
+				if(getVoxel(vnow.x()+offset[0],vnow.y()+offset[1],vnow.z()+offset[2]))
+					toRemoveNext.insert(Voxel(vnow.x()+offset[0],vnow.y()+offset[1],vnow.z()+offset[2]));
+			}
+		}
+		toRemoveNow = toRemoveNext;
+		toRemoveNext.clear();
+	}
+}
+
+/* empties the component of wich 'v' forms part */
+void VoxelSpace::emptyComponent(Voxel v)
+{
+	std::set<Voxel> toRemoveNow;
+	std::set<Voxel> toRemoveNext;
+	toRemoveNow.insert(v);
+
+	while(toRemoveNow.size() > 0)
+	{
+		std::set<Voxel>::iterator it = toRemoveNow.begin();
+		std::set<Voxel>::iterator end= toRemoveNow.end();
+		for(;it!=end;++it)
+		{
+			const Voxel &vnow = *it;
+			setVoxel(vnow,false);
+			for(int x=-1;x<=1;++x)
+				for(int y=-1;y<=1;++y)
+					for(int z=-1;z<=1;++z)
+					{
+						if(getVoxel(vnow.x()+x,vnow.y()+y,vnow.z()+z))
+							toRemoveNext.insert(Voxel(vnow.x()+x,vnow.y()+y,vnow.z()+z));
+					}
+		}
+		toRemoveNow = toRemoveNext;
+		toRemoveNext.clear();
+	}
+}
+
+int VoxelSpace::countComponents()
+{
+	int totalNumVoxels = m_spaceSize[0] * m_spaceSize[1] * m_spaceSize[2];
+	bool * spaceBackup = new bool[totalNumVoxels];
+	memcpy(spaceBackup, m_space, sizeof(bool) * totalNumVoxels);
+	int numComponents = 0;
+	for(unsigned int x=0;x<m_spaceSize[0];++x)
+		for(unsigned int y=0;y<m_spaceSize[1];++y)
+			for(unsigned int z=0;z<m_spaceSize[2];++z)
+			{
+				if(getVoxel(x,y,z)) // found a new component
+				{
+					++numComponents;
+					emptyComponent(Voxel(x,y,z));
+				}
+			}
+	delete [] m_space;
+	m_space = spaceBackup;
+	return numComponents;
+}
+
+int VoxelSpace::countVolumes()
+{
+	int totalNumVoxels = m_spaceSize[0] * m_spaceSize[1] * m_spaceSize[2];
+	bool * spaceBackup = new bool[totalNumVoxels];
+	memcpy(spaceBackup, m_space, sizeof(bool) * totalNumVoxels);
+	int numVolumes= 0;
+	for(unsigned int x=0;x<m_spaceSize[0];++x)
+		for(unsigned int y=0;y<m_spaceSize[1];++y)
+			for(unsigned int z=0;z<m_spaceSize[2];++z)
+			{
+				if(getVoxel(x,y,z)) // found a new volume
+				{
+					++numVolumes;
+					emptyVolume(Voxel(x,y,z));
+				}
+			}
+	delete [] m_space;
+	m_space = spaceBackup;
+	return numVolumes;
+}
+

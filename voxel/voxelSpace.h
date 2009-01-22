@@ -31,7 +31,9 @@ namespace voxel
 			bool isBorder(int x, int y, int z);
 			bool getVoxel(int x, int y, int z);
 			bool getVoxel(Voxel p);
-
+			
+			int countComponents();
+			int countVolumes();
 
 			std::set<Face> & triangulated(){return m_faces;} 									// remove
 			std::set<Point> & triangulationPoints(){ return m_points;} 							// remove
@@ -45,6 +47,9 @@ namespace voxel
 
 			uint64_t getIntFromSurfacePoint(const Point& p); 		//remove
 			Point getSurfacePointFromInt(uint64_t i); 				// remove
+
+			void emptyComponent(Voxel v);
+			void emptyVolume(Voxel v);
 
 
 			int voxelToIndex(Voxel p);

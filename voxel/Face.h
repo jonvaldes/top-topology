@@ -38,6 +38,7 @@ namespace voxel
 					return true;
 				return false;
 			}
+			Triplet<float> normal;
 	};
 }
 #endif

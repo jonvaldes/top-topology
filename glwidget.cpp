@@ -8,10 +8,10 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 	m_voxelSpace = new voxel::VoxelSpace(100,100,100,0);
 
 	m_voxelSpace->addBall(voxel::Point(20,20,20),18);
-	m_voxelSpace->addBall(voxel::Point(40,40,30),30);
+	m_voxelSpace->addBall(voxel::Point(40,40,30),20);
 	m_voxelSpace->removeCilinder(voxel::Point(30,30,5),voxel::Point(30,30,50),10);
 	m_voxelSpace->removeCilinder(voxel::Point(40,40,30),voxel::Point(90,15,5),10);
-	m_voxelSpace->removeCilinder(voxel::Point(40,40,35),voxel::Point(-90,-15,5),10);
+	//m_voxelSpace->removeCilinder(voxel::Point(40,40,35),voxel::Point(-90,-15,5),10);
 
 	m_voxelSpace->addBall(voxel::Point(65,65,65),20);
 
@@ -58,6 +58,7 @@ void GLWidget::paintGL()
 		{
 			const voxel::Face &f = *iter;
 			glColor3f(f[0][0]/100.0,f[0][1]/100.0,f[0][2]/100.0);
+			//glNormalf(f.normal[0], f.normal[1],f.normal[2]);
 			glVertex3f(f[0][0],f[0][1],f[0][2]);
 			glVertex3f(f[1][0],f[1][1],f[1][2]);
 			glVertex3f(f[2][0],f[2][1],f[2][2]);

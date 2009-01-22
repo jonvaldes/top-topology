@@ -16,12 +16,12 @@ namespace voxel
 			const int & y() const {return v[1];}
 			const int & z() const {return v[2];}
 
-			bool operator==(const Point &p) const
+			bool operator==(const Voxel &p) const
 			{
 				return (x() == p.x() && y() == p.y() &&	z() == p.z());
 			}
 
-			bool operator<(const Point &p) const
+			bool operator<(const Voxel &p) const
 			{
 				return coordsSum() < p.coordsSum();
 			}
