@@ -1,11 +1,11 @@
 #include <QtGui>
-#include <math.h>
+#include <cmath>
 #include "glwidget.h"
 #include "PortableGL.h"
 
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 {
-	m_voxelSpace = new voxel::VoxelSpace(100,100,100,0);
+	m_voxelSpace.reset(new voxel::VoxelSpace(100,100,100,0));
 
 	m_voxelSpace->addBall(voxel::Point(20,20,20),18);
 	m_voxelSpace->addBall(voxel::Point(40,40,30),20);
@@ -15,12 +15,14 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 
 	m_voxelSpace->addBall(voxel::Point(65,65,65),20);
 
-	m_camera = new glutil::FreeCamera(geom::Point3D(-100,100,0), M_PI_2,M_PI_4,60);
+	m_triangulation.reset(new voxel::SpaceTriangulation(*m_voxelSpace));
+	m_triangulation->triangulate();
 
-	m_voxelSpace->triangulate();
+	printf("Number of holes: %i\n", m_triangulation->calculateNumHoles());
+
 	lastButton = 0; 
 	m_wireframe = false;
-	m_showNonManifold = false;
+	m_camera = new glutil::FreeCamera(geom::Point3D(-100,100,0), M_PI_2,M_PI_4,60);
 }
 
 
@@ -42,23 +44,21 @@ void GLWidget::paintGL()
     makeCurrent();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Dibujamos todo el contenido
 	if(m_wireframe)
 	    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
 	glLoadIdentity();
 	m_camera->setAsGLCamera(widgetWidth,widgetHeight);
 	
-	std::set<voxel::Face> & faces = m_voxelSpace->triangulated();
-	std::set<voxel::Face>::iterator iter;
-	std::set<voxel::Face>::iterator end = faces.end();
+	const voxel::FaceSet &faces = m_triangulation->faces();
+	voxel::FaceSet::iterator iter;
+	voxel::FaceSet::iterator end = faces.end();
 	glBegin(GL_QUADS);
 	{
 		for(iter = faces.begin(); iter!=end;iter++)
 		{
 			const voxel::Face &f = *iter;
 			glColor3f(f[0][0]/100.0,f[0][1]/100.0,f[0][2]/100.0);
-			//glNormalf(f.normal[0], f.normal[1],f.normal[2]);
 			glVertex3f(f[0][0],f[0][1],f[0][2]);
 			glVertex3f(f[1][0],f[1][1],f[1][2]);
 			glVertex3f(f[2][0],f[2][1],f[2][2]);
@@ -68,30 +68,6 @@ void GLWidget::paintGL()
 	glEnd();
 	    
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-
-	typedef std::vector<std::pair<voxel::Point, voxel::Point> > EdgesVec;
-
-	EdgesVec & points = m_voxelSpace->nonManifoldEdges();
-	EdgesVec::iterator iter2;
-	EdgesVec::iterator end2 = points.end();
-
-	if(m_showNonManifold)
-	{
-		glDisable(GL_DEPTH_TEST);
-		glBegin(GL_LINES);
-		{
-			glColor3f(1.0,1.0,1.0);
-			for(iter2 = points.begin(); iter2!=end2;++iter2)
-			{
-				voxel::Point p1 = iter2->first;
-				voxel::Point p2 = iter2->second;
-				glVertex3f(p1.x(),p1.y(),p1.z());
-				glVertex3f(p2.x(),p2.y(),p2.z());
-			}
-		}
-		glEnd();
-		glEnable(GL_DEPTH_TEST);
-	}
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -154,12 +130,6 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::setWireframe(bool showWire)
 {
 	m_wireframe = showWire;
-	updateGL();
-}
-
-void GLWidget::setShowNonManifold(bool showEdges)
-{
-	m_showNonManifold = showEdges;
 	updateGL();
 }
 

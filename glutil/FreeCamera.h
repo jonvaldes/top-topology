@@ -29,7 +29,7 @@ namespace glutil
 		private:
 		geom::Vector3D pitchYawToVector(float yaw, float pitch) const;
 			geom::Point3D m_position;
-			// Estos dos estan en radianes!
+			// These two are in radians!
 			float m_yaw; // giro alrededor del eje vertical
 			float m_pitch; // giro alrededor del eje horizontal, perpendicular a la vista
 			float m_FOV;

@@ -4,8 +4,11 @@
 #include <QGLWidget>
 #include <QTime>
 #include <vector>
+#include <memory>
 #include "voxel/voxelSpace.h"
+#include "voxel/spaceTriangulation.h"
 #include "glutil/FreeCamera.h"
+
 
 using namespace std;
 
@@ -20,7 +23,6 @@ class GLWidget : public QGLWidget
 
     public slots:
 		void setWireframe(bool showWire);
-		void setShowNonManifold(bool showEdges);
 
     protected:
         void initializeGL();
@@ -37,10 +39,11 @@ class GLWidget : public QGLWidget
         int widgetHeight;
 	
 		QPoint lastPos;
-		voxel::VoxelSpace * m_voxelSpace;
+		auto_ptr<voxel::VoxelSpace> m_voxelSpace;
+		auto_ptr<voxel::SpaceTriangulation> m_triangulation;
+
 		int lastButton;
 		bool m_wireframe;
-		bool m_showNonManifold;
 		glutil::FreeCamera * m_camera;
 };
 

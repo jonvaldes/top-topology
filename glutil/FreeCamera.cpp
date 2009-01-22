@@ -18,16 +18,11 @@ void FreeCamera::move(geom::Vector3D distance)
 	m_position = m_position+distance;
 }
 
-
 void FreeCamera::advance(float amount)
 {
-//	printf("advancing:%f\n",amount);
-//	geom::Vector3D view = pitchYawToVector(m_yaw,m_pitch);
 	m_position.x-=amount*sin(-m_yaw);
 	m_position.z-=amount*cos(-m_yaw);
 	m_position.y+=amount*sin(-m_pitch);
-
-//	m_position = m_position + view*(-amount);
 }
 
 void FreeCamera::strafeRight(float amount)
@@ -68,12 +63,11 @@ void FreeCamera::setAsGLCamera(int windowWidth, int windowHeight)
 	glLoadIdentity();
 	gluPerspective (m_FOV, windowWidth/(float)windowHeight, FREECAMERA_NEAR_DISTANCE, FREECAMERA_FAR_DISTANCE);
 
-	glMatrixMode(GL_MODELVIEW);                          // Make sure the MODELVIEW matrix is selected
-	glLoadIdentity();                                    // Load the identity matrix
-	glRotatef(m_pitch*toDegrees,1.0f,0.0f,0.0f);                     // Rotate up off the xy-plane by beta
-	glRotatef(m_yaw*toDegrees,0.0f,1.0f,0.0f);                    // Rotate by alpha from the negative z-axis
+	glMatrixMode(GL_MODELVIEW);                          
+	glLoadIdentity();                                    
+	glRotatef(m_pitch*toDegrees,1.0f,0.0f,0.0f);         
+	glRotatef(m_yaw*toDegrees,0.0f,1.0f,0.0f);           
 	glTranslatef(-m_position.x,-m_position.y,-m_position.z);  
-
 }
 
 geom::Vector3D FreeCamera::pitchYawToVector(float yaw, float pitch) const
