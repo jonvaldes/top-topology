@@ -16,7 +16,7 @@ SpaceTriangulation::~SpaceTriangulation()
 
 }
 
-PointID SpaceTriangulation::getIDFromSurfacePoint(const Point& p)
+PointID SpaceTriangulation::getIDFromSurfacePoint(const Point& p) const
 {
 	uint64_t x = (uint64_t)ceil(p.x());
 	uint64_t y = (uint64_t)ceil(p.y());
@@ -25,7 +25,7 @@ PointID SpaceTriangulation::getIDFromSurfacePoint(const Point& p)
 	return x + (m_space.getSize(0)+1)*y +(m_space.getSize(0)+1)*(m_space.getSize(1)+1)*z;
 }
 
-Point SpaceTriangulation::getSurfacePointFromID(PointID i)
+Point SpaceTriangulation::getSurfacePointFromID(PointID i) const
 {
 	float z = i/((m_space.getSize(0)+1) * (m_space.getSize(1)+1)) - 0.5;
 	long int remnantz = i%((m_space.getSize(0)+1) *( m_space.getSize(1)+1));
