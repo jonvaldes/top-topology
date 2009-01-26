@@ -31,6 +31,8 @@ namespace voxel
 			int countComponents() const;
 			int calculateNumHoles() const;
 
+			voxel::SpaceTriangulation getComponent(PointID p) const;
+
 			PointID getIDFromSurfacePoint(const Point& p) const;
 			Point getSurfacePointFromID(PointID p) const;
 

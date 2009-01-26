@@ -23,6 +23,15 @@ class GLWidget : public QGLWidget
 
     public slots:
 		void setWireframe(bool showWire);
+	
+	signals:
+		void bettiNumberChanged(QString);
+		void holesChanged(QString);
+		void componentsChanged(QString);
+		void volumesChanged(QString);
+		void pointsChanged(QString);
+		void edgesChanged(QString);
+		void facesChanged(QString);
 
     protected:
         void initializeGL();
@@ -41,6 +50,8 @@ class GLWidget : public QGLWidget
 		QPoint lastPos;
 		auto_ptr<voxel::VoxelSpace> m_voxelSpace;
 		auto_ptr<voxel::SpaceTriangulation> m_triangulation;
+
+		void recalculateSurface();
 
 		int lastButton;
 		bool m_wireframe;
