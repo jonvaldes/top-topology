@@ -13,8 +13,3 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-// remove things
-// sfsdksdhkfjksdhf
-//sd fsdjh fjhsdhf sdhkfhj
-// another suicide, just to check
-// BIG CHANGE
