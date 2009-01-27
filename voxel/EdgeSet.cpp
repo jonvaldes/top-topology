@@ -91,3 +91,28 @@ void EdgeSet::removeComponent(PointID p)
 	}
 }
 
+EdgeSet EdgeSet::getComponent(PointID p) const
+{
+	EdgeSet result;
+	std::vector<PointID> toAdd, toAddNext;
+
+	toAdd.push_back(p);
+
+	while(toAdd.size() > 0)
+	{
+		int numToAdd= toAdd.size();
+		for(int i=0; i<numToAdd;++i)
+		{
+			// We take note of the points connected to this one
+			std::vector<PointID> connected = getConnectedTo(toAdd[i]);
+			toAddNext.insert(toAddNext.begin(), connected.begin(), connected.end());
+			// And add this point
+			std::pair<AdjacencyList::const_iterator, AdjacencyList::const_iterator> range; 
+			range = m_edges.equal_range(toAdd[i]);
+			result.m_edges.insert(range.first,range.second);
+		}
+		toAdd = toAddNext;
+		toAddNext.clear();
+	}
+	return result;
+}

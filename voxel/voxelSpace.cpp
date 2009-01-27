@@ -180,6 +180,56 @@ void VoxelSpace::emptyComponent(Voxel v)
 	}
 }
 
+std::vector<VoxelSpace> VoxelSpace::getComponents() const
+{
+	VoxelSpace v = *this;
+	return v.getComponentsDestructively();
+}
+
+std::vector<VoxelSpace> VoxelSpace::getComponentsDestructively()
+{
+	std::vector<VoxelSpace> result;
+	for(unsigned int x=0;x<m_spaceSize[0];++x)
+		for(unsigned int y=0;y<m_spaceSize[1];++y)
+			for(unsigned int z=0;z<m_spaceSize[2];++z)
+				if(getVoxel(x,y,z)) // found a new component
+					result.push_back(getComponentDestructively(Voxel(x,y,z)));
+
+	return result;
+}
+
+VoxelSpace VoxelSpace::getComponentDestructively(Voxel v)
+{
+	std::set<Voxel> toRemoveNow;
+	std::set<Voxel> toRemoveNext;
+	toRemoveNow.insert(v);
+
+	VoxelSpace result(m_spaceSize[0], m_spaceSize[1], m_spaceSize[2],false);
+
+	while(toRemoveNow.size() > 0)
+	{
+		std::set<Voxel>::iterator it = toRemoveNow.begin();
+		std::set<Voxel>::iterator end= toRemoveNow.end();
+		for(;it!=end;++it)
+		{
+			const Voxel &vnow = *it;
+			setVoxel(vnow,false);
+			result.setVoxel(vnow,true);
+
+			for(int x=-1;x<=1;++x)
+				for(int y=-1;y<=1;++y)
+					for(int z=-1;z<=1;++z)
+						if(getVoxel(vnow.x()+x,vnow.y()+y,vnow.z()+z))
+							toRemoveNext.insert(Voxel(vnow.x()+x,vnow.y()+y,vnow.z()+z));
+		}
+		toRemoveNow = toRemoveNext;
+		toRemoveNext.clear();
+	}
+	return result;
+}
+
+
+
 int VoxelSpace::countComponents() const
 {
 	VoxelSpace v = *this;

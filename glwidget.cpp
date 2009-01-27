@@ -16,9 +16,6 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 	m_voxelSpace->addBall(voxel::Point(65,65,65),20);
 
 	m_triangulation.reset(new voxel::SpaceTriangulation(*m_voxelSpace));
-	m_triangulation->triangulate();
-
-	printf("Number of holes: %i\n", m_triangulation->calculateNumHoles());
 
 	lastButton = 0; 
 	m_wireframe = false;
@@ -34,6 +31,8 @@ void GLWidget::initializeGL()
 {
     makeCurrent();
 	qglClearColor(QColor::fromRgb(0,0,0));
+
+	recalculateSurface();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -131,5 +130,18 @@ void GLWidget::setWireframe(bool showWire)
 {
 	m_wireframe = showWire;
 	updateGL();
+}
+
+void GLWidget::recalculateSurface()
+{
+	m_triangulation->triangulate();
+
+	emit bettiNumberChanged("Not calculated");
+	emit holesChanged(QString("").setNum(m_triangulation->calculateNumHoles()));
+	emit volumesChanged(QString("").setNum(m_voxelSpace->countVolumes()));
+	emit componentsChanged(QString("").setNum(m_triangulation->countComponents()));
+	emit pointsChanged(QString("").setNum(m_triangulation->points().size()));
+	emit edgesChanged(QString("").setNum(m_triangulation->edges().totalEdgesCount()));
+	emit facesChanged(QString("").setNum(m_triangulation->faces().size()));
 }
 

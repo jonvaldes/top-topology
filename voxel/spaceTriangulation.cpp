@@ -164,3 +164,26 @@ int SpaceTriangulation::calculateNumHoles() const
 	int holes = points - edges + faces - volumes - components;
 	return holes/-2;
 }
+
+SpaceTriangulation SpaceTriangulation::getComponent(PointID p) const
+{
+	SpaceTriangulation result(m_space);
+	result.m_edges = m_edges.getComponent(p);
+	AdjacencyList::const_iterator it ;
+	AdjacencyList::const_iterator end = result.m_edges.end();
+	for(it = result.m_edges.begin(); it!=end; ++it)
+		result.m_points.insert(it->first);
+
+	FaceSet::const_iterator faceIt;
+	FaceSet::const_iterator faceEnd = m_faces.end();
+	for(faceIt = m_faces.begin(); faceIt!=faceEnd;++faceIt)
+	{
+		for(int i=0;i<4;++i)
+			if(result.m_points.find(getIDFromSurfacePoint((*faceIt)[i])) != result.m_points.end())
+			{
+				result.m_faces.insert(*faceIt);
+				break;
+			}
+	}
+	return result;
+}
