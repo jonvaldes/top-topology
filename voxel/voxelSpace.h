@@ -34,12 +34,16 @@ namespace voxel
 			bool isBorder(int x, int y, int z) const;
 			bool getVoxel(int x, int y, int z) const;
 			bool getVoxel(Voxel p) const;
-			
+		
+			std::vector<VoxelSpace> getComponents() const;
 			int countComponents() const;
 			int countVolumes() const;
 
 
 		private:
+			std::vector<VoxelSpace> getComponentsDestructively();
+			VoxelSpace getComponentDestructively(Voxel v);
+
 			int countComponentsDestructively();
 			int countVolumesDestructively();
 
