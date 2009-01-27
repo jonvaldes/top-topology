@@ -13,10 +13,7 @@ int main(int argc, char *argv[])
     return app.exec();
 }
 
-// new comment
-//  fhg fgfhgfh fdskjh sdkhfksdkghd hk
-// anothr comments
-// A SUICIDE
+// remove things
 // sfsdksdhkfjksdhf
 //sd fsdjh fjhsdhf sdhkfhj
 // another suicide, just to check
