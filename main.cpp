@@ -19,3 +19,4 @@ int main(int argc, char *argv[])
 // A SUICIDE
 // sfsdksdhkfjksdhf
 //sd fsdjh fjhsdhf sdhkfhj
+// another suicide, just to check
