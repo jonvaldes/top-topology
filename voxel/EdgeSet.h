@@ -2,7 +2,7 @@
 #define __EDGE_SET_H__
 #include <map>
 #include <vector>
-
+#include <sys/types.h>
 namespace voxel
 {
 	typedef uint64_t PointID;
