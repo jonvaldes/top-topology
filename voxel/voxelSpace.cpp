@@ -3,6 +3,8 @@
 #include <map>
 #include <cmath>
 #include <stdio.h>
+#include <stdlib.h>
+
 
 using namespace voxel;
 
