@@ -1,0 +1,13 @@
+For each quad
+	1 - take first and third points in the face (they will form a diagonal)
+ 	2 - merge the second point into the first one, taking the (non repeating) sum of edges connected to each of them, and assigning that to the first point
+	3 - remove the second point from the list
+	3 - update the points connected to the second point to show them as connected to the first
+	4 - update the faces connected to the second point 
+	4 - remove the quad from the list
+
+
+
+Then we might have spurious edges which we'll have to remove to get the topology generator.
+
+
