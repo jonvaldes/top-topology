@@ -4,7 +4,7 @@
 #include <vector>
 #include "PointID.h"
 
-namespace voxel
+namespace surface 
 {
 	typedef std::multimap<PointID,PointID> AdjacencyList;
 	
@@ -23,9 +23,6 @@ namespace voxel
 
 			bool areConnected(PointID p1, PointID p2) const;
 			std::vector<PointID> getConnectedTo(PointID p) const;
-
-			void removeComponent(PointID p);
-			EdgeSet getComponent(PointID p) const;
 
 		private:
 			AdjacencyList m_edges;

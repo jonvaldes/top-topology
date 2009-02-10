@@ -2,7 +2,7 @@
 #define __POINTID_H__
 
 #include <stdint.h>
-namespace voxel
+namespace surface
 {
 	typedef uint64_t PointID;
 }

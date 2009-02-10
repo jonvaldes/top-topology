@@ -1,10 +1,9 @@
 #include "EdgeSet.h"
 
-using namespace voxel;
+using namespace surface;
 
 EdgeSet::EdgeSet()
 {
-
 }
 
 EdgeSet::~EdgeSet()
@@ -34,7 +33,6 @@ void EdgeSet::addEdge(PointID p1, PointID p2)
 		m_edges.insert(std::pair<PointID, PointID>(p1,p2));
 		m_edges.insert(std::pair<PointID, PointID>(p2,p1));
 	}
-	
 }
 
 void EdgeSet::clear()
@@ -67,52 +65,3 @@ std::vector<PointID> EdgeSet::getConnectedTo(PointID p) const
 	return result;
 }
 
-void EdgeSet::removeComponent(PointID p)
-{
-	std::vector<PointID> toRemove;
-	std::vector<PointID> toRemoveNext;
-	toRemove.push_back(p);
-
-	while(toRemove.size() > 0)
-	{
-		int numToRemove = toRemove.size();
-		for(int i=0; i<numToRemove;++i)
-		{
-			// We take note of the points connected to this one
-			std::vector<PointID> connected = getConnectedTo(toRemove[i]);
-			toRemoveNext.insert(toRemoveNext.begin(), connected.begin(), connected.end());
-			// And remove this point
-			std::pair<AdjacencyList::iterator, AdjacencyList::iterator> range; 
-			range = m_edges.equal_range(toRemove[i]);
-			m_edges.erase(range.first,range.second);
-		}
-		toRemove = toRemoveNext;
-		toRemoveNext.clear();
-	}
-}
-
-EdgeSet EdgeSet::getComponent(PointID p) const
-{
-	EdgeSet result;
-	std::vector<PointID> toAdd, toAddNext;
-
-	toAdd.push_back(p);
-
-	while(toAdd.size() > 0)
-	{
-		int numToAdd= toAdd.size();
-		for(int i=0; i<numToAdd;++i)
-		{
-			// We take note of the points connected to this one
-			std::vector<PointID> connected = getConnectedTo(toAdd[i]);
-			toAddNext.insert(toAddNext.begin(), connected.begin(), connected.end());
-			// And add this point
-			std::pair<AdjacencyList::const_iterator, AdjacencyList::const_iterator> range; 
-			range = m_edges.equal_range(toAdd[i]);
-			result.m_edges.insert(range.first,range.second);
-		}
-		toAdd = toAddNext;
-		toAddNext.clear();
-	}
-	return result;
-}

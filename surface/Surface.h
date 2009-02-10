@@ -3,25 +3,26 @@
 
 #include "EdgeSet.h"
 #include "Face.h"
+#include "../geom/Point3D.h"
 
 namespace surface 
 {
 	typedef std::vector<Face> FacesList;
-	typedef std::vector<Point> PointsList;
+	typedef std::vector<geom::Point3D> PointsList;
 	
-	class SpaceTriangulation;
-
 	class Surface
 	{
 		public:
-			Surface(const SpaceTriangulation & triangulation);
+			Surface();
+			void addPoint(const geom::Point3D &p);
+			void addFace(const Face &f);
 
+			void render();
 
 		private:
 			PointsList m_points;
 			EdgeSet	m_edges;
 			FacesList m_faces;
-
 	};
 }
 
