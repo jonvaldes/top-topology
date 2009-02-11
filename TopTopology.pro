@@ -4,8 +4,6 @@ QT += core \
     gui \
     opengl
 
-LIBS += -lfl
-
 QMAKE_CXXFLAGS += -O3
 
 HEADERS += TopTopologyGUI.h \
