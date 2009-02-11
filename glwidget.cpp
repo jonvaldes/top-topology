@@ -7,7 +7,8 @@
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 {
 	lastButton = 0; 
-	m_wireframe = false;
+	m_wireframe = true;
+	m_showFaces = true;
 	m_lightAngle = M_PI;
 	m_mergeTime = 0;
 	m_timer = 0;
@@ -44,12 +45,13 @@ void GLWidget::initializeGL()
 	qglClearColor(QColor::fromRgb(140,140,190));
 
 	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
 
 	GLfloat ambientLight[]={0.4,0.35,0.35,1.0};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientLight);
 
-	m_camera = new glutil::FreeCamera(geom::Point3D(-100,100,0), M_PI_2,M_PI_4,60);
-
+	m_camera = new glutil::FreeCamera(geom::Point3D(0,2,10), 0,0,60);
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -58,16 +60,24 @@ void GLWidget::paintGL()
     makeCurrent();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if(m_wireframe)
-	    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-
 	glLoadIdentity();
 	m_camera->setAsGLCamera(widgetWidth,widgetHeight);
-	setGLLight();
 
-	m_surface.render(m_mergeTime);
-    
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+	m_surface.render(m_mergeTime, m_wireframe, m_showFaces);
+
+	// We draw the X and Z axis
+	glDisable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glDepthMask(GL_FALSE);
+	glBegin(GL_LINES);
+	{
+		glColor4f(0.8,0.0,0.0,0.4); glVertex3f(-10.0,0.0,  0.0); glVertex3f(10.0,0.0, 0.0);
+		glColor4f(0.0,0.8,0.0,0.4); glVertex3f(  0.0,0.0,-10.0); glVertex3f( 0.0,0.0,10.0);
+	}
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glDepthMask(GL_TRUE);
+	setGLLight();
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -130,6 +140,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 void GLWidget::setWireframe(bool showWire)
 {
 	m_wireframe = showWire;
+	updateGL();
+}
+
+void GLWidget::setShowFaces(bool showFaces)
+{
+	m_showFaces = showFaces;
 	updateGL();
 }
 

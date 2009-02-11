@@ -32,7 +32,7 @@ void Surface::addFace(const Face &f)
 	m_faceNormals.push_back( (n2+n1).getNormalized());
 }
 
-void Surface::render(float lastFaceMergingPercentage)
+void Surface::render(float lastFaceMergingPercentage, bool showWireframe, bool showFaces)
 {
 	int numFaces = m_faces.size();
 
@@ -54,14 +54,48 @@ void Surface::render(float lastFaceMergingPercentage)
 		finalFirstPoint = firstPoint + (-moveVector) * lastFaceMergingPercentage;
 		finalThirdPoint = thirdPoint + moveVector * lastFaceMergingPercentage;
 	}
-	
-	glBegin(GL_QUADS);
-	for(int i=0;i<numFaces;++i)
+
+	if(showFaces)
 	{
-		glNormal3fv(m_faceNormals[i].dv);
-		for(int j=0;j<4;++j)
+		glColor4f(0.8,0.8,0.8,1.0);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1,1);
+		glBegin(GL_QUADS);
+		for(int i=0;i<numFaces;++i)
 		{
-			PointID pid = m_faces[i][j];
+			glNormal3fv(m_faceNormals[i].dv);
+			for(int j=0;j<4;++j)
+			{
+				PointID pid = m_faces[i][j];
+				if(pid == firstPointID)
+					glVertex3fv(finalFirstPoint.v);
+				else if (pid == thirdPointID)
+					glVertex3fv(finalThirdPoint.v);
+				else
+					glVertex3fv(m_points[pid].v);
+			}
+		}
+		glEnd();
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
+
+	if(showWireframe)
+	{
+		AdjacencyList::const_iterator it;
+		AdjacencyList::const_iterator end = m_edges.end();
+		glBegin(GL_LINES);
+		glColor4f(0.0,0.0,0.0,1.0);
+		for(it = m_edges.begin(); it!=end; ++it)
+		{
+			PointID pid = it->first;
+			if(pid == firstPointID)
+				glVertex3fv(finalFirstPoint.v);
+			else if (pid == thirdPointID)
+				glVertex3fv(finalThirdPoint.v);
+			else
+				glVertex3fv(m_points[pid].v);
+
+			pid = it->second;
 			if(pid == firstPointID)
 				glVertex3fv(finalFirstPoint.v);
 			else if (pid == thirdPointID)
@@ -69,8 +103,8 @@ void Surface::render(float lastFaceMergingPercentage)
 			else
 				glVertex3fv(m_points[pid].v);
 		}
+		glEnd();
 	}
-	glEnd();
 }
 
 void Surface::mergeLastFace()

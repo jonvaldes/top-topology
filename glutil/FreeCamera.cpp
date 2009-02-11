@@ -10,7 +10,7 @@ using namespace glutil;
 namespace glutil
 {
 	static const float FREECAMERA_NEAR_DISTANCE = 0.1;
-	static const float FREECAMERA_FAR_DISTANCE = 1000;
+	static const float FREECAMERA_FAR_DISTANCE = 10000;
 }
 
 void FreeCamera::move(geom::Vector3D distance)

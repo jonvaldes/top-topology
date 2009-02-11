@@ -20,6 +20,7 @@ class GLWidget : public QGLWidget
 
     public slots:
 		void setWireframe(bool showWire);
+		void setShowFaces(bool showFaces);
 		void setLightAngle(int angle);
 		void setMergeSpeed(int speed);
 		void openOBJFile();
@@ -54,6 +55,7 @@ class GLWidget : public QGLWidget
 
 		int lastButton;
 		bool m_wireframe;
+		bool m_showFaces;
 		glutil::FreeCamera * m_camera;
 };
 

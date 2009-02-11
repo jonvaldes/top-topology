@@ -109,6 +109,19 @@
        <property name="text">
         <string>Wireframe</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBox_2">
+       <property name="text">
+        <string>Faces</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -506,6 +519,7 @@
     <slot>setWireframe(bool)</slot>
     <slot>setLightAngle(int)</slot>
     <slot>setMergeSpeed(int)</slot>
+    <slot>setShowFaces(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -636,6 +650,22 @@
     <hint type="destinationlabel">
      <x>202</x>
      <y>415</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>setShowFaces(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>46</x>
+     <y>209</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>210</x>
+     <y>208</y>
     </hint>
    </hints>
   </connection>
