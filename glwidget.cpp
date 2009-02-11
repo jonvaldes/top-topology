@@ -12,6 +12,8 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 	m_lightAngle = M_PI;
 	m_mergeTime = 0;
 	m_timer = 0;
+	for(int i=0;i<4;++i)
+		m_keysStatus[i] = false;
 }
 
 
@@ -95,10 +97,16 @@ void GLWidget::resizeGL(int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void GLWidget::focusOutEvent ( QFocusEvent * event )  
+{
+	for(int i=0;i<4;++i)
+		m_keysStatus[i] = false;
+}
+
 void GLWidget::wheelEvent(QWheelEvent * event)
 {
 	m_camera->advance(event->delta()/100.0);
-    updateGL();
+	queueUpdate();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
@@ -113,18 +121,27 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 void GLWidget::keyPressEvent ( QKeyEvent * event )
 {
 	if(event->key() == Qt::Key_W)
-		m_camera->advance(1.0);
-
+		m_keysStatus[KEY_W] = true;
 	if(event->key() == Qt::Key_S)
-		m_camera->advance(-1.0);
-
+		m_keysStatus[KEY_S] = true;
 	if(event->key() == Qt::Key_A)
-		m_camera->strafeLeft(1.0);
-
+		m_keysStatus[KEY_A] = true;
 	if(event->key() == Qt::Key_D)
-		m_camera->strafeRight(1.0);
+		m_keysStatus[KEY_D] = true;
 
-    updateGL();
+	queueUpdate();
+}
+
+void GLWidget::keyReleaseEvent(QKeyEvent * event)
+{
+	if(event->key() == Qt::Key_W)
+		m_keysStatus[KEY_W] = false;
+	if(event->key() == Qt::Key_S)
+		m_keysStatus[KEY_S] = false;
+	if(event->key() == Qt::Key_A)
+		m_keysStatus[KEY_A] = false;
+	if(event->key() == Qt::Key_D)
+		m_keysStatus[KEY_D] = false;
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -142,19 +159,19 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 	else
 		m_camera->mouseLookTurn(dx/60.0,dy/60.0);
 
-    updateGL();
+	queueUpdate();
 }
 
 void GLWidget::setWireframe(bool showWire)
 {
 	m_wireframe = showWire;
-	updateGL();
+	queueUpdate();
 }
 
 void GLWidget::setShowFaces(bool showFaces)
 {
 	m_showFaces = showFaces;
-	updateGL();
+	queueUpdate();
 }
 
 void GLWidget::openOBJFile()
@@ -165,32 +182,59 @@ void GLWidget::openOBJFile()
 	std::string filename = fn.toStdString();
 	modelfile::OBJParser parser(filename.c_str());
 	m_surface = parser.getSurface();
+	m_backupSurface = m_surface;
 	emit surfacePoints(QString("").setNum(m_surface.getNumPoints()));
 	emit surfaceEdges(QString("").setNum(m_surface.getNumEdges()));
 	emit surfaceFaces(QString("").setNum(m_surface.getNumFaces()));
 
-	updateGL();
+	queueUpdate();
 }
 
 void GLWidget::setLightAngle(int angle)
 {
 	m_lightAngle = angle/10.0f / 180.0 * M_PI;
-	updateGL();
+	queueUpdate();
 }
 
 void GLWidget::timerEvent(QTimerEvent *)
 {
 	m_mergeTime+=m_mergeSpeed;
 	printf("MergeTime:%f\n",m_mergeTime);
+
+	bool mergeStopped = (m_mergeSpeed == 0);
+
 	if(m_mergeTime >= 1.0)
 	{
 		m_surface.mergeLastFace();
 		m_mergeTime = 0;
-		if(m_surface.getNumFaces() == 0)
+		if(m_surface.getNumFaces() > 0)
+			mergeStopped = false;
+	}
+
+	if(m_keysStatus[KEY_W])
+		m_camera->advance(0.2);
+
+	if(m_keysStatus[KEY_S])
+		m_camera->advance(-0.2);
+
+	if(m_keysStatus[KEY_A])
+		m_camera->strafeLeft(0.2);
+
+	if(m_keysStatus[KEY_D])
+		m_camera->strafeRight(0.2);
+
+	bool cameraStopped = true;
+	for(int i=0;i<4;++i)
+		if(m_keysStatus[i])
 		{
-			killTimer(m_timer);
-			m_timer = 0;
+			cameraStopped = false;
+			break;
 		}
+
+	if(mergeStopped && cameraStopped)
+	{
+		killTimer(m_timer);
+		m_timer = 0;
 	}
 	updateGL();
 }
@@ -198,11 +242,32 @@ void GLWidget::timerEvent(QTimerEvent *)
 void GLWidget::setMergeSpeed(int speed)
 {
 	if(m_timer)
+	{
 		killTimer(m_timer);
+		m_timer=0;
+	}
 
 	m_mergeSpeed = speed/10000.0;
 	printf("MergeSpeed set to %f\n",m_mergeSpeed);
 
-	if(m_mergeSpeed != 0)
-		m_timer = startTimer(1/60.0*1000.0);
+	queueUpdate();
+}
+
+void GLWidget::queueUpdate()
+{
+	if(!m_timer)
+		m_timer = startTimer(1.0/120.0*1000.0);
+}
+
+void GLWidget::resetCamera()
+{
+	delete m_camera;
+    m_camera = new glutil::FreeCamera(geom::Point3D(0,2,10), 0,0,60);
+	queueUpdate();
+}
+
+void GLWidget::resetSurface()
+{
+	m_surface = m_backupSurface;
+	queueUpdate();
 }

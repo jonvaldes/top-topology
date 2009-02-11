@@ -13,6 +13,7 @@ using namespace std;
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
+	enum keys{KEY_W=0,KEY_A,KEY_S,KEY_D};
 
     public:
         GLWidget(QWidget *parent = 0);
@@ -23,6 +24,8 @@ class GLWidget : public QGLWidget
 		void setShowFaces(bool showFaces);
 		void setLightAngle(int angle);
 		void setMergeSpeed(int speed);
+		void resetCamera();
+		void resetSurface();
 		void openOBJFile();
 	signals:
 		void surfacePoints(QString);
@@ -30,6 +33,7 @@ class GLWidget : public QGLWidget
 		void surfaceEdges(QString);
 
     protected:
+		void queueUpdate();
         void initializeGL();
         void paintGL();
 		void setGLLight();
@@ -38,6 +42,8 @@ class GLWidget : public QGLWidget
         void mouseMoveEvent(QMouseEvent *event);
         void wheelEvent(QWheelEvent * event);
         void keyPressEvent ( QKeyEvent * event );
+        void keyReleaseEvent ( QKeyEvent * event );
+		void focusOutEvent ( QFocusEvent * event );
 		void timerEvent( QTimerEvent *e );
 
 
@@ -49,6 +55,8 @@ class GLWidget : public QGLWidget
 		QPoint lastPos;
 
 		surface::Surface m_surface;
+		surface::Surface m_backupSurface;
+
 		float m_mergeTime;
 		float m_mergeSpeed;
 		int m_timer;
@@ -56,6 +64,7 @@ class GLWidget : public QGLWidget
 		int lastButton;
 		bool m_wireframe;
 		bool m_showFaces;
+		bool m_keysStatus[4];
 		glutil::FreeCamera * m_camera;
 };
 

@@ -520,6 +520,7 @@
     <slot>setLightAngle(int)</slot>
     <slot>setMergeSpeed(int)</slot>
     <slot>setShowFaces(bool)</slot>
+    <slot>resetCamera()</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -666,6 +667,22 @@
     <hint type="destinationlabel">
      <x>210</x>
      <y>208</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>glwidget</receiver>
+   <slot>resetCamera()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>80</x>
+     <y>553</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>210</x>
+     <y>559</y>
     </hint>
    </hints>
   </connection>
