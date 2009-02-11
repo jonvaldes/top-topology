@@ -176,7 +176,7 @@ void GLWidget::setShowFaces(bool showFaces)
 
 void GLWidget::openOBJFile()
 {
-	QString fn = QFileDialog::getOpenFileName( this, QString::null, tr( "OBJ Files (*.obj *.OBJ);;All Files (*)" ));
+	QString fn = QFileDialog::getOpenFileName( this, tr("Open OBJ model file"), ".", tr( "OBJ Files (*.obj);;All Files (*.*)" ));
 	if ( fn.isEmpty() )
 		return;
 	std::string filename = fn.toStdString();
@@ -241,15 +241,7 @@ void GLWidget::timerEvent(QTimerEvent *)
 
 void GLWidget::setMergeSpeed(int speed)
 {
-	if(m_timer)
-	{
-		killTimer(m_timer);
-		m_timer=0;
-	}
-
 	m_mergeSpeed = speed/10000.0;
-	printf("MergeSpeed set to %f\n",m_mergeSpeed);
-
 	queueUpdate();
 }
 
