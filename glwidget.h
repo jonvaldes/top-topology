@@ -27,6 +27,7 @@ class GLWidget : public QGLWidget
 		void resetCamera();
 		void resetSurface();
 		void openOBJFile();
+		void mustSpherify(bool must);
 	signals:
 		void surfacePoints(QString);
 		void surfaceFaces(QString);
@@ -65,6 +66,7 @@ class GLWidget : public QGLWidget
 		bool m_wireframe;
 		bool m_showFaces;
 		bool m_keysStatus[4];
+		bool m_mustSpherify;
 		glutil::FreeCamera * m_camera;
 };
 

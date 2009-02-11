@@ -65,3 +65,24 @@ std::vector<PointID> EdgeSet::getConnectedTo(PointID p) const
 	return result;
 }
 
+void EdgeSet::mergePoint(PointID p, PointID into)
+{
+	std::pair<AdjacencyList::iterator, AdjacencyList::iterator> pointsRange; 
+	pointsRange = m_edges.equal_range(p); // we get the range of elements with first == p 
+
+	// Now we remove them all, and change the points connected to this one be connected to 'into'
+	AdjacencyList::const_iterator it;
+	for(it = pointsRange.first; it!=pointsRange.second; ++it)
+	{
+		PointID other = it->second;
+		std::pair<AdjacencyList::iterator, AdjacencyList::iterator> otherRange; 
+		otherRange = m_edges.equal_range(other);
+		addEdge(into, other);
+		AdjacencyList::iterator it2;
+		for(it2 = otherRange.first; it2!= otherRange.second; ++it2)
+			if(it2->second == p)
+				it2->second = into;
+	}
+	m_edges.erase(pointsRange.first, pointsRange.second);
+}
+

@@ -5,6 +5,7 @@
 #include "Face.h"
 #include "../geom/Point3D.h"
 #include "../geom/Vector3D.h"
+#include <set>
 
 namespace surface 
 {
@@ -24,9 +25,12 @@ namespace surface
 			void render(float lastFaceMergingPercentage, bool showWireframe, bool showFaces);
 
 			void mergeLastFace();
+			void applyLoveAndHate( float timeStep);
+
 
 		private:
 			PointsList m_points;
+			std::set<PointID> m_discardedPoints;
 			EdgeSet	m_edges;
 			FacesList m_faces;
 			VectorsList m_faceNormals;

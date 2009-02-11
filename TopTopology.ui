@@ -535,6 +535,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QCheckBox" name="checkBox_3">
+       <property name="text">
+        <string>Do spherify</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Face merging speed:</string>
@@ -605,6 +612,7 @@
     <slot>setShowFaces(bool)</slot>
     <slot>resetCamera()</slot>
     <slot>resetSurface()</slot>
+    <slot>mustSpherify(bool)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -783,6 +791,22 @@
     <hint type="destinationlabel">
      <x>247</x>
      <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_3</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>mustSpherify(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>330</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>349</x>
+     <y>327</y>
     </hint>
    </hints>
   </connection>

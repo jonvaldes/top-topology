@@ -11,6 +11,7 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 	m_showFaces = true;
 	m_lightAngle = M_PI;
 	m_mergeTime = 0;
+	m_mustSpherify = false;
 	m_timer = 0;
 	for(int i=0;i<4;++i)
 		m_keysStatus[i] = false;
@@ -199,7 +200,6 @@ void GLWidget::setLightAngle(int angle)
 void GLWidget::timerEvent(QTimerEvent *)
 {
 	m_mergeTime+=m_mergeSpeed;
-	printf("MergeTime:%f\n",m_mergeTime);
 
 	bool mergeStopped = (m_mergeSpeed == 0);
 
@@ -230,8 +230,11 @@ void GLWidget::timerEvent(QTimerEvent *)
 			cameraStopped = false;
 			break;
 		}
+	if(m_mustSpherify)
+		for(int i=0;i<4;++i)
+			m_surface.applyLoveAndHate(0.01);
 
-	if(mergeStopped && cameraStopped)
+	if(mergeStopped && cameraStopped && !m_mustSpherify)
 	{
 		killTimer(m_timer);
 		m_timer = 0;
@@ -261,5 +264,12 @@ void GLWidget::resetCamera()
 void GLWidget::resetSurface()
 {
 	m_surface = m_backupSurface;
+	queueUpdate();
+}
+
+void GLWidget::mustSpherify(bool must)
+{
+	m_mustSpherify = must;
+
 	queueUpdate();
 }

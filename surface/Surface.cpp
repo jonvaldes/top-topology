@@ -113,5 +113,71 @@ void Surface::mergeLastFace()
 	// Here, the first and third points in the last face should be merged
 	// (I'm saying last, because when using a vector you can remove the last element in a fast way, using pop_back)
 
+	if(m_faces.size() == 0)
+		return;
+	PointID p1 = m_faces.back()[0];
+	PointID p2 = m_faces.back()[2];
+
+	geom::Point3D middlePoint;
+	for(int i=0;i<3;++i)
+		middlePoint.v[i] = (m_points[p1].v[i] + m_points[p2].v[i])/2;
+
+	m_points[p1] = middlePoint;
+
+	int numFaces = m_faces.size();
+	for(int i=0;i<numFaces;++i)
+		for(int j=0;j<4;++j)
+			if(m_faces[i][j] == p2)
+				m_faces[i][j] = p1;
+
+	m_edges.mergePoint(p2,p1);
+
+	m_discardedPoints.insert(p2);
 	m_faces.pop_back();
+}
+
+
+void Surface::applyLoveAndHate( float timeStep)
+{
+	int numPoints = m_points.size();
+	float love, hate, totalForce;
+	geom::Vector3D qToP;
+	geom::Vector3D pToQ;
+	for(int i=0;i<numPoints;++i)
+	{
+		if(m_discardedPoints.find(i) != m_discardedPoints.end()) // if the point is among the discarded ones
+			continue;
+		geom::Point3D p = m_points[i];
+		geom::Point3D & pref = m_points[i];
+
+		std::vector<PointID> connected = m_edges.getConnectedTo(i);
+		int numConnected = connected.size();
+		for(int n=0;n<numConnected;++n)
+		{
+			const geom::Point3D & q = m_points[connected[n]];
+			float dist = p.distance(q);
+			if(dist < 0.05)
+				dist = 0.05f;
+			pToQ = q-p;
+			pref = pref + pToQ/ sqrt(dist) * 0.005f;
+		}
+	
+
+		// naive implementation, O(n*n) complexity
+		// general Love-hate
+		for(int j=0;j<numPoints;++j)
+		{
+			if(j == i)
+				continue;
+			//if(m_discardedPoints.find(j) != m_discardedPoints.end()) // if the point is among the discarded ones
+			//	continue;
+			const geom::Point3D & q = m_points[j];
+			float sqDist = p.distanceSquared(q);
+			qToP = p-q;
+
+			hate = (1.0f/sqDist) * 0.005f;
+			pref = pref + qToP * (hate* timeStep);
+		}
+	}
+
 }

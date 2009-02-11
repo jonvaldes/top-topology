@@ -21,6 +21,8 @@ namespace surface
 			void addEdge(PointID p1, PointID p2);
 			void clear();
 
+			void mergePoint(PointID p, PointID into);
+
 			bool areConnected(PointID p1, PointID p2) const;
 			std::vector<PointID> getConnectedTo(PointID p) const;
 
