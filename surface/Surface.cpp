@@ -20,16 +20,26 @@ void Surface::addFace(const Face &f)
 	m_edges.addEdge(f[1], f[2]);
 	m_edges.addEdge(f[2], f[3]);
 	m_edges.addEdge(f[3], f[0]);
+
+	geom::Vector3D v1 = m_points[f[0]] - m_points[f[1]];
+	geom::Vector3D v2 = m_points[f[2]] - m_points[f[1]];
+	geom::Vector3D n1 = v2.vectorProduct(v1);
+
+	geom::Vector3D v3 = m_points[f[2]] - m_points[f[3]];
+	geom::Vector3D v4 = m_points[f[0]] - m_points[f[3]];
+	geom::Vector3D n2 = v4.vectorProduct(v3);
+
+	m_faceNormals.push_back( (n2+n1).getNormalized());
 }
 
 void Surface::render()
 {
 	int numFaces = m_faces.size();
 	printf("Rendering %i faces\n",numFaces);
-	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 	glBegin(GL_QUADS);
 	for(int i=0;i<numFaces;++i)
 	{
+		glNormal3fv(m_faceNormals[i].dv);
 		glColor3fv(m_points[m_faces[i][0]].v);
 		glVertex3fv(m_points[m_faces[i][0]].v);
 		glVertex3fv(m_points[m_faces[i][1]].v);
@@ -37,5 +47,4 @@ void Surface::render()
 		glVertex3fv(m_points[m_faces[i][3]].v);
 	}
 	glEnd();
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 }

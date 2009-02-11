@@ -15,10 +15,36 @@ GLWidget::~GLWidget()
 {
 }
 
+void GLWidget::setGLLight()
+{
+	float ambientLight0[4] = {0.1,0.1,0.1,1.0f};
+	float diffuseLight0[4] = {0.5,0.5,0.5,1.0f};
+	float specularLight0[4] = {0.0,0.0,0.0,1.0f};
+	float lightPosition0 [4] = {2, -4, 2,1.0};
+
+	float lightAngle = 45.0;
+
+	lightPosition0[0] = 20*sin(lightAngle);
+	lightPosition0[1] = 1.0;
+	lightPosition0[2] = 20*cos(lightAngle);
+
+	glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight0);
+	glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight0);
+	glLightfv(GL_LIGHT0,GL_SPECULAR,specularLight0);
+	glLightfv(GL_LIGHT0,GL_POSITION,lightPosition0);
+
+	glEnable(GL_LIGHT0);
+}
+
 void GLWidget::initializeGL()
 {
     makeCurrent();
 	qglClearColor(QColor::fromRgb(0,0,0));
+
+	glEnable(GL_LIGHTING);
+
+	GLfloat ambientLight[]={0.4,0.35,0.35,1.0};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientLight);
 
 	m_camera = new glutil::FreeCamera(geom::Point3D(-100,100,0), M_PI_2,M_PI_4,60);
 
@@ -35,6 +61,7 @@ void GLWidget::paintGL()
 
 	glLoadIdentity();
 	m_camera->setAsGLCamera(widgetWidth,widgetHeight);
+	setGLLight();
 
 	m_surface.render();
     
