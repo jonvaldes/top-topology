@@ -9,6 +9,8 @@ namespace glutil
 	{
 		public:
 			FreeCamera(geom::Point3D pos, float yaw, float pitch, float FOV) : m_position(pos), m_yaw(yaw), m_pitch(pitch), m_FOV(FOV) {}
+			void setPosition(geom::Point3D pos){m_position = pos;}
+			void setPitchAndYaw(float pitch, float yaw){m_pitch = pitch, m_yaw = yaw;}
 			void move(geom::Vector3D distance);
 			void advance(float amount);
 			void strafeLeft(float amount);

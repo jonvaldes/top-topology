@@ -113,9 +113,5 @@ void Surface::mergeLastFace()
 	// Here, the first and third points in the last face should be merged
 	// (I'm saying last, because when using a vector you can remove the last element in a fast way, using pop_back)
 
-
-
-
-
-
+	m_faces.pop_back();
 }

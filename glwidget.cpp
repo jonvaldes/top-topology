@@ -97,7 +97,7 @@ void GLWidget::resizeGL(int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void GLWidget::focusOutEvent ( QFocusEvent * event )  
+void GLWidget::focusOutEvent ( QFocusEvent * )  
 {
 	for(int i=0;i<4;++i)
 		m_keysStatus[i] = false;
@@ -207,8 +207,8 @@ void GLWidget::timerEvent(QTimerEvent *)
 	{
 		m_surface.mergeLastFace();
 		m_mergeTime = 0;
-		if(m_surface.getNumFaces() > 0)
-			mergeStopped = false;
+		if(m_surface.getNumFaces() == 0)
+			mergeStopped = true;
 	}
 
 	if(m_keysStatus[KEY_W])
@@ -241,7 +241,7 @@ void GLWidget::timerEvent(QTimerEvent *)
 
 void GLWidget::setMergeSpeed(int speed)
 {
-	m_mergeSpeed = speed/10000.0;
+	m_mergeSpeed = speed/500.0;
 	queueUpdate();
 }
 
@@ -253,8 +253,8 @@ void GLWidget::queueUpdate()
 
 void GLWidget::resetCamera()
 {
-	delete m_camera;
-    m_camera = new glutil::FreeCamera(geom::Point3D(0,2,10), 0,0,60);
+	m_camera->setPosition(geom::Point3D(0,2,10));
+	m_camera->setPitchAndYaw(0,0);
 	queueUpdate();
 }
 
