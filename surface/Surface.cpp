@@ -1,6 +1,7 @@
 #include "Surface.h"
 #include "../PortableGL.h"
 #include <cstdio>
+#include <limits.h>
 using namespace surface;
 
 Surface::Surface()
