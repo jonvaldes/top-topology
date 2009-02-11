@@ -10,8 +10,6 @@ OBJECTS_DIR  =$$builddir
 MOC_DIR      =$$builddir
 RCC_DIR      =$$builddir
 
-LIBS += -lfl
-
 QMAKE_CXXFLAGS += -O3
 
 HEADERS += TopTopologyGUI.h \
