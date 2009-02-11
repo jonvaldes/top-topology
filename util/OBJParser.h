@@ -8,9 +8,6 @@
 
 namespace modelfile
 {
-	typedef std::vector< geom::Point3D > PointCoordsVector;
-	typedef std::vector< surface::Face > FacePointIDsVector;
-
 	class OBJParser
 	{
 		public:

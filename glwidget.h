@@ -1,5 +1,5 @@
-#ifndef GLWIDGET_H
-#define GLWIDGET_H
+#ifndef __GLWIDGET_H__
+#define __GLWIDGET_H__
 
 #include <QGLWidget>
 #include <QTime>
@@ -10,7 +10,6 @@
 
 using namespace std;
 
-/** GLWidget*/
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -32,7 +31,6 @@ class GLWidget : public QGLWidget
         void wheelEvent(QWheelEvent * event);
         void keyPressEvent ( QKeyEvent * event );
 
-	
     private:
         int widgetWidth;
         int widgetHeight;
@@ -46,5 +44,5 @@ class GLWidget : public QGLWidget
 		glutil::FreeCamera * m_camera;
 };
 
-#endif /*GLWIDGET_H*/
+#endif 
 
