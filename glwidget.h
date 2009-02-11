@@ -20,6 +20,7 @@ class GLWidget : public QGLWidget
 
     public slots:
 		void setWireframe(bool showWire);
+		void setLightAngle(int angle);
 		void openOBJFile();
 
     protected:
@@ -35,6 +36,7 @@ class GLWidget : public QGLWidget
     private:
         int widgetWidth;
         int widgetHeight;
+		float m_lightAngle;
 	
 		QPoint lastPos;
 

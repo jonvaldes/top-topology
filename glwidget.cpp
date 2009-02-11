@@ -8,6 +8,7 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 {
 	lastButton = 0; 
 	m_wireframe = false;
+	m_lightAngle = M_PI;
 }
 
 
@@ -22,11 +23,10 @@ void GLWidget::setGLLight()
 	float specularLight0[4] = {0.0,0.0,0.0,1.0f};
 	float lightPosition0 [4] = {2, -4, 2,1.0};
 
-	float lightAngle = 45.0;
 
-	lightPosition0[0] = 20*sin(lightAngle);
+	lightPosition0[0] = 20*sin(m_lightAngle - M_PI);
 	lightPosition0[1] = 1.0;
-	lightPosition0[2] = 20*cos(lightAngle);
+	lightPosition0[2] = 20*cos(m_lightAngle - M_PI);
 
 	glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight0);
 	glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight0);
@@ -39,7 +39,7 @@ void GLWidget::setGLLight()
 void GLWidget::initializeGL()
 {
     makeCurrent();
-	qglClearColor(QColor::fromRgb(0,0,0));
+	qglClearColor(QColor::fromRgb(140,140,190));
 
 	glEnable(GL_LIGHTING);
 
@@ -139,5 +139,11 @@ void GLWidget::openOBJFile()
 	std::string filename = fn.toStdString();
 	modelfile::OBJParser parser(filename.c_str());
 	m_surface = parser.getSurface();
+	updateGL();
+}
+
+void GLWidget::setLightAngle(int angle)
+{
+	m_lightAngle = angle/10.0f / 180.0 * M_PI;
 	updateGL();
 }
