@@ -505,6 +505,7 @@
     <slot>openOBJFile()</slot>
     <slot>setWireframe(bool)</slot>
     <slot>setLightAngle(int)</slot>
+    <slot>setMergeSpeed(int)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -619,6 +620,22 @@
     <hint type="destinationlabel">
      <x>107</x>
      <y>350</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glwidget</receiver>
+   <slot>setMergeSpeed(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>414</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>202</x>
+     <y>415</y>
     </hint>
    </hints>
   </connection>

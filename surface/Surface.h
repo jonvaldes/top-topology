@@ -21,7 +21,9 @@ namespace surface
 			int getNumFaces() const {return m_faces.size();}
 			int getNumEdges() const {return m_edges.totalEdgesCount();}
 
-			void render();
+			void render(float lastFaceMergingPercentage);
+
+			void mergeLastFace();
 
 		private:
 			PointsList m_points;

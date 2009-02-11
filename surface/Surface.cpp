@@ -32,18 +32,56 @@ void Surface::addFace(const Face &f)
 	m_faceNormals.push_back( (n2+n1).getNormalized());
 }
 
-void Surface::render()
+void Surface::render(float lastFaceMergingPercentage)
 {
 	int numFaces = m_faces.size();
+
+	int lastFace = numFaces-1;
+	PointID firstPointID = LONG_MAX, thirdPointID = LONG_MAX;
+	geom::Point3D finalFirstPoint;
+	geom::Point3D finalThirdPoint;
+
+	if(lastFace >= 0)
+	{
+		firstPointID = m_faces[lastFace][0];
+		thirdPointID= m_faces[lastFace][2];
+
+		geom::Point3D firstPoint = m_points[firstPointID];
+		geom::Point3D thirdPoint = m_points[thirdPointID];
+
+		geom::Vector3D moveVector = (firstPoint - thirdPoint)/2;
+
+		finalFirstPoint = firstPoint + (-moveVector) * lastFaceMergingPercentage;
+		finalThirdPoint = thirdPoint + moveVector * lastFaceMergingPercentage;
+	}
+	
 	glBegin(GL_QUADS);
 	for(int i=0;i<numFaces;++i)
 	{
 		glNormal3fv(m_faceNormals[i].dv);
-		glColor3fv(m_points[m_faces[i][0]].v);
-		glVertex3fv(m_points[m_faces[i][0]].v);
-		glVertex3fv(m_points[m_faces[i][1]].v);
-		glVertex3fv(m_points[m_faces[i][2]].v);
-		glVertex3fv(m_points[m_faces[i][3]].v);
+		for(int j=0;j<4;++j)
+		{
+			PointID pid = m_faces[i][j];
+			if(pid == firstPointID)
+				glVertex3fv(finalFirstPoint.v);
+			else if (pid == thirdPointID)
+				glVertex3fv(finalThirdPoint.v);
+			else
+				glVertex3fv(m_points[pid].v);
+		}
 	}
 	glEnd();
+}
+
+void Surface::mergeLastFace()
+{
+
+	// Here, the first and third points in the last face should be merged
+	// (I'm saying last, because when using a vector you can remove the last element in a fast way, using pop_back)
+
+
+
+
+
+
 }

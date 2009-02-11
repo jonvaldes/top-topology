@@ -9,6 +9,8 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 	lastButton = 0; 
 	m_wireframe = false;
 	m_lightAngle = M_PI;
+	m_mergeTime = 0;
+	m_timer = 0;
 }
 
 
@@ -63,7 +65,7 @@ void GLWidget::paintGL()
 	m_camera->setAsGLCamera(widgetWidth,widgetHeight);
 	setGLLight();
 
-	m_surface.render();
+	m_surface.render(m_mergeTime);
     
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 }
@@ -150,4 +152,33 @@ void GLWidget::setLightAngle(int angle)
 {
 	m_lightAngle = angle/10.0f / 180.0 * M_PI;
 	updateGL();
+}
+
+void GLWidget::timerEvent(QTimerEvent *)
+{
+	m_mergeTime+=m_mergeSpeed;
+	printf("MergeTime:%f\n",m_mergeTime);
+	if(m_mergeTime >= 1.0)
+	{
+		m_surface.mergeLastFace();
+		m_mergeTime = 0;
+		if(m_surface.getNumFaces() == 0)
+		{
+			killTimer(m_timer);
+			m_timer = 0;
+		}
+	}
+	updateGL();
+}
+
+void GLWidget::setMergeSpeed(int speed)
+{
+	if(m_timer)
+		killTimer(m_timer);
+
+	m_mergeSpeed = speed/10000.0;
+	printf("MergeSpeed set to %f\n",m_mergeSpeed);
+
+	if(m_mergeSpeed != 0)
+		m_timer = startTimer(1/60.0*1000.0);
 }

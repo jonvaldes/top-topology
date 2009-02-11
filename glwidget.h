@@ -21,6 +21,7 @@ class GLWidget : public QGLWidget
     public slots:
 		void setWireframe(bool showWire);
 		void setLightAngle(int angle);
+		void setMergeSpeed(int speed);
 		void openOBJFile();
 	signals:
 		void surfacePoints(QString);
@@ -36,6 +37,8 @@ class GLWidget : public QGLWidget
         void mouseMoveEvent(QMouseEvent *event);
         void wheelEvent(QWheelEvent * event);
         void keyPressEvent ( QKeyEvent * event );
+		void timerEvent( QTimerEvent *e );
+
 
     private:
         int widgetWidth;
@@ -45,6 +48,9 @@ class GLWidget : public QGLWidget
 		QPoint lastPos;
 
 		surface::Surface m_surface;
+		float m_mergeTime;
+		float m_mergeSpeed;
+		int m_timer;
 
 		int lastButton;
 		bool m_wireframe;
