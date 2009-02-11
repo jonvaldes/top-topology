@@ -76,7 +76,7 @@ void GLWidget::paintGL()
 		glColor4f(0.8,0.0,0.0,0.4); glVertex3f(-10.0,0.0,  0.0); glVertex3f(10.0,0.0, 0.0);
 		glColor4f(0.0,0.8,0.0,0.4); glVertex3f(  0.0,0.0,-10.0); glVertex3f( 0.0,0.0,10.0);
 		glColor4f(0.5,0.5,0.5,0.5);
-		for(int i=0;i<20;++i)
+		for(int i=0;i<=20;++i)
 		{
 			glVertex3f(-10,0.0,i-10);
 			glVertex3f(10,0.0,i-10);
