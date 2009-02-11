@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>TopTopology</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -88,6 +88,26 @@
        </property>
        <property name="tickInterval">
         <number>900</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="text">
+        <string>Wireframe</string>
        </property>
       </widget>
      </item>
@@ -204,7 +224,7 @@
              <font>
               <weight>75</weight>
               <bold>true</bold>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="frameShape">
@@ -298,7 +318,7 @@
              <font>
               <weight>75</weight>
               <bold>true</bold>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="frameShape">
@@ -392,7 +412,7 @@
              <font>
               <weight>75</weight>
               <bold>true</bold>
-              <underline>true</underline>
+              <underline>false</underline>
              </font>
             </property>
             <property name="frameShape">
@@ -479,14 +499,9 @@
    <header>glwidget.h</header>
    <container>1</container>
    <slots>
-    <signal>zoomValueChanged(int)</signal>
-    <signal>componentsChanged(QString)</signal>
-    <signal>volumesChanged(QString)</signal>
-    <signal>pointsChanged(QString)</signal>
-    <signal>edgesChanged(QString)</signal>
-    <signal>facesChanged(QString)</signal>
-    <signal>holesChanged(QString)</signal>
-    <signal>bettiNumberChanged(QString)</signal>
+    <signal>surfacePoints(QString)</signal>
+    <signal>surfaceEdges(QString)</signal>
+    <signal>surfaceFaces(QString)</signal>
     <slot>openOBJFile()</slot>
     <slot>setWireframe(bool)</slot>
     <slot>setLightAngle(int)</slot>
@@ -540,6 +555,70 @@
     <hint type="destinationlabel">
      <x>186</x>
      <y>101</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>glwidget</receiver>
+   <slot>setWireframe(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>99</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>204</x>
+     <y>190</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>glwidget</sender>
+   <signal>surfacePoints(QString)</signal>
+   <receiver>pointsLabel</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>213</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>106</x>
+     <y>301</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>glwidget</sender>
+   <signal>surfaceEdges(QString)</signal>
+   <receiver>edgesLabel</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>333</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>109</x>
+     <y>323</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>glwidget</sender>
+   <signal>surfaceFaces(QString)</signal>
+   <receiver>facesLabel</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>351</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>107</x>
+     <y>350</y>
     </hint>
    </hints>
   </connection>

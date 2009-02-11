@@ -35,7 +35,6 @@ void Surface::addFace(const Face &f)
 void Surface::render()
 {
 	int numFaces = m_faces.size();
-	printf("Rendering %i faces\n",numFaces);
 	glBegin(GL_QUADS);
 	for(int i=0;i<numFaces;++i)
 	{

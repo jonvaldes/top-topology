@@ -139,6 +139,10 @@ void GLWidget::openOBJFile()
 	std::string filename = fn.toStdString();
 	modelfile::OBJParser parser(filename.c_str());
 	m_surface = parser.getSurface();
+	emit surfacePoints(QString("").setNum(m_surface.getNumPoints()));
+	emit surfaceEdges(QString("").setNum(m_surface.getNumEdges()));
+	emit surfaceFaces(QString("").setNum(m_surface.getNumFaces()));
+
 	updateGL();
 }
 

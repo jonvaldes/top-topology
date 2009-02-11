@@ -17,6 +17,9 @@ namespace surface
 			Surface();
 			void addPoint(const geom::Point3D &p);
 			void addFace(const Face &f);
+			int getNumPoints() const {return m_points.size();}
+			int getNumFaces() const {return m_faces.size();}
+			int getNumEdges() const {return m_edges.totalEdgesCount();}
 
 			void render();
 

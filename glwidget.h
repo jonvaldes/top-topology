@@ -22,6 +22,10 @@ class GLWidget : public QGLWidget
 		void setWireframe(bool showWire);
 		void setLightAngle(int angle);
 		void openOBJFile();
+	signals:
+		void surfacePoints(QString);
+		void surfaceFaces(QString);
+		void surfaceEdges(QString);
 
     protected:
         void initializeGL();
