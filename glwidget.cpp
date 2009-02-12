@@ -177,7 +177,7 @@ void GLWidget::setShowFaces(bool showFaces)
 
 void GLWidget::openOBJFile()
 {
-	QString fn = QFileDialog::getOpenFileName( this, tr("Open OBJ model file"), ".", tr( "OBJ Files (*.obj);;All Files (*.*)" ));
+	QString fn = QFileDialog::getOpenFileName( this, tr("Open OBJ model file"), "./shapes/", tr( "OBJ Files (*.obj);;All Files (*.*)" ));
 	if ( fn.isEmpty() )
 		return;
 	std::string filename = fn.toStdString();
