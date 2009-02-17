@@ -25,6 +25,7 @@ namespace surface
 
 			bool areConnected(PointID p1, PointID p2) const;
 			std::vector<PointID> getConnectedTo(PointID p) const;
+			std::vector<PointID> getConnectedTo(PointID p, PointID excludedP1, PointID excludedP2) const;
 
 		private:
 			AdjacencyList m_edges;

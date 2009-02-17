@@ -6,12 +6,15 @@
 #include "../geom/Point3D.h"
 #include "../geom/Vector3D.h"
 #include <set>
+#include <list>
 
 namespace surface 
 {
-	typedef std::vector<Face> FacesList;
+	typedef std::list<Face> FacesList;
 	typedef std::vector<geom::Point3D> PointsList;
-	typedef std::vector<geom::Vector3D> VectorsList;
+	typedef std::list<geom::Vector3D> VectorsList;
+	class CannotMergeMoreException	{	};
+
 	class Surface
 	{
 		public:
@@ -26,7 +29,7 @@ namespace surface
 
 			void mergeLastFace();
 			void applyLoveAndHate( float timeStep);
-
+			void findNextMergeable();
 
 		private:
 			PointsList m_points;
@@ -34,7 +37,6 @@ namespace surface
 			EdgeSet	m_edges;
 			FacesList m_faces;
 			VectorsList m_faceNormals;
-
 	};
 }
 

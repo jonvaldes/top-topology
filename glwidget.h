@@ -67,6 +67,7 @@ class GLWidget : public QGLWidget
 		bool m_showFaces;
 		bool m_keysStatus[4];
 		bool m_mustSpherify;
+		bool impossibleToMerge;
 		glutil::FreeCamera * m_camera;
 };
 

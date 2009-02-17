@@ -65,6 +65,21 @@ std::vector<PointID> EdgeSet::getConnectedTo(PointID p) const
 	return result;
 }
 
+std::vector<PointID> EdgeSet::getConnectedTo(PointID p, PointID excludedP1, PointID excludedP2) const
+{
+	std::pair<AdjacencyList::const_iterator, AdjacencyList::const_iterator> range; 
+	range = m_edges.equal_range(p); // we get the range of elements with first == p1
+	std::vector<PointID> result;
+	AdjacencyList::const_iterator it;
+		for(it = range.first; it!=range.second;++it)
+		{
+			if((it->second != excludedP1) && (it->second != excludedP2))
+			result.push_back(it->second);
+		}
+
+	return result;
+}
+
 void EdgeSet::mergePoint(PointID p, PointID into)
 {
 	std::pair<AdjacencyList::iterator, AdjacencyList::iterator> pointsRange; 
@@ -72,16 +87,31 @@ void EdgeSet::mergePoint(PointID p, PointID into)
 
 	// Now we remove them all, and change the points connected to this one be connected to 'into'
 	AdjacencyList::const_iterator it;
-	for(it = pointsRange.first; it!=pointsRange.second; ++it)
+	for(it = pointsRange.first; it!=pointsRange.second;++it)
 	{
 		PointID other = it->second;
+		addEdge(into, other);
+
 		std::pair<AdjacencyList::iterator, AdjacencyList::iterator> otherRange; 
 		otherRange = m_edges.equal_range(other);
-		addEdge(into, other);
 		AdjacencyList::iterator it2;
-		for(it2 = otherRange.first; it2!= otherRange.second; ++it2)
+		bool removed = false;
+		for(it2 = otherRange.first; it2!= otherRange.second;)
 			if(it2->second == p)
-				it2->second = into;
+			{
+				m_edges.erase(it2);
+				otherRange = m_edges.equal_range(other);
+				it2 = otherRange.first;
+				removed = true;
+			}
+			else
+				++it2;
+		if(removed)
+		{
+			pointsRange = m_edges.equal_range(p);
+			it = pointsRange.first;
+		}
+
 	}
 	m_edges.erase(pointsRange.first, pointsRange.second);
 }

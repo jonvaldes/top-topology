@@ -188,6 +188,8 @@ void GLWidget::openOBJFile()
 	emit surfaceEdges(QString("").setNum(m_surface.getNumEdges()));
 	emit surfaceFaces(QString("").setNum(m_surface.getNumFaces()));
 
+	m_surface.findNextMergeable();
+	impossibleToMerge = false;
 	queueUpdate();
 }
 
@@ -199,13 +201,22 @@ void GLWidget::setLightAngle(int angle)
 
 void GLWidget::timerEvent(QTimerEvent *)
 {
-	m_mergeTime+=m_mergeSpeed;
+	if(!impossibleToMerge)
+		m_mergeTime+=m_mergeSpeed;
 
 	bool mergeStopped = (m_mergeSpeed == 0);
-
-	if(m_mergeTime >= 1.0)
+	if(m_mergeTime >= 1.0 && !impossibleToMerge)
 	{
-		m_surface.mergeLastFace();
+		try
+		{
+			m_surface.mergeLastFace();
+		}
+		catch(surface::CannotMergeMoreException e)
+		{
+			impossibleToMerge = true;
+			mergeStopped = true;
+		}
+
 		m_mergeTime = 0;
 		if(m_surface.getNumFaces() == 0)
 			mergeStopped = true;
@@ -264,6 +275,7 @@ void GLWidget::resetCamera()
 void GLWidget::resetSurface()
 {
 	m_surface = m_backupSurface;
+	impossibleToMerge = false;
 	queueUpdate();
 }
 

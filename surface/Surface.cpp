@@ -2,6 +2,7 @@
 #include "../PortableGL.h"
 #include <cstdio>
 #include <limits.h>
+#include <algorithm>
 using namespace surface;
 
 Surface::Surface()
@@ -13,6 +14,57 @@ void Surface::addPoint(const geom::Point3D &p)
 {
 	m_points.push_back(p);
 }
+
+void Surface::findNextMergeable()
+{
+	VectorsList::iterator itn = m_faceNormals.begin();
+	FacesList::iterator it;
+	FacesList::iterator end = m_faces.end();
+	
+	for( it = m_faces.begin(); it!=end; ++it, ++itn)
+	{
+		// To check if this face is mergeable, check for its 1st and 3rd points, and see if they share connections
+		std::vector<PointID> p1 = m_edges.getConnectedTo((*it)[0], (*it)[1], (*it)[3]);
+		std::sort(p1.begin(), p1.end());
+		std::vector<PointID> p3 = m_edges.getConnectedTo((*it)[2], (*it)[1], (*it)[3]);
+		std::sort(p3.begin(),p3.end());
+
+		if(std::find_first_of(p1.begin(), p1.end(), p3.begin(),p3.end()) == p1.end()) // if 1st and 3rd share no connections
+		{
+			Face f = *it;
+			geom::Vector3D normal = *itn;
+			m_faces.erase(it);
+			m_faceNormals.erase(itn);
+			m_faces.push_back(f);
+			m_faceNormals.push_back(normal);
+			return;
+		}
+		std::vector<PointID> p2 = m_edges.getConnectedTo((*it)[1], (*it)[0], (*it)[2]);
+		std::sort(p2.begin(), p2.end());
+		std::vector<PointID> p4 = m_edges.getConnectedTo((*it)[3], (*it)[0], (*it)[2]);
+		std::sort(p4.begin(),p4.end());
+	
+		if(std::find_first_of(p2.begin(), p2.end(), p4.begin(),p4.end()) == p2.end()) // if 2nd and 4th share no connections
+		{
+			Face f = *it;
+			PointID p1 = f[0];
+			f[0] = f[1];
+			f[1] = f[2];
+			f[2] = f[3];
+			f[3] = p1;
+
+			geom::Vector3D normal = *itn;
+			m_faces.erase(it);
+			m_faceNormals.erase(itn);
+			m_faces.push_back(f);
+			m_faceNormals.push_back(normal);
+			return;
+		}
+
+	}
+	throw(CannotMergeMoreException());
+}
+
 
 void Surface::addFace(const Face &f)
 {
@@ -35,17 +87,14 @@ void Surface::addFace(const Face &f)
 
 void Surface::render(float lastFaceMergingPercentage, bool showWireframe, bool showFaces)
 {
-	int numFaces = m_faces.size();
-
-	int lastFace = numFaces-1;
 	PointID firstPointID = LONG_MAX, thirdPointID = LONG_MAX;
 	geom::Point3D finalFirstPoint;
 	geom::Point3D finalThirdPoint;
 
-	if(lastFace >= 0)
+	if(m_faces.size() > 0)
 	{
-		firstPointID = m_faces[lastFace][0];
-		thirdPointID= m_faces[lastFace][2];
+		firstPointID = m_faces.back()[0];
+		thirdPointID= m_faces.back()[2];
 
 		geom::Point3D firstPoint = m_points[firstPointID];
 		geom::Point3D thirdPoint = m_points[thirdPointID];
@@ -62,12 +111,20 @@ void Surface::render(float lastFaceMergingPercentage, bool showWireframe, bool s
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1,1);
 		glBegin(GL_QUADS);
-		for(int i=0;i<numFaces;++i)
+		FacesList::iterator it;
+		FacesList::iterator end = m_faces.end();
+		VectorsList::iterator it2;
+		for(it = m_faces.begin(), it2 = m_faceNormals.begin();it!=end;++it)
 		{
-			glNormal3fv(m_faceNormals[i].dv);
+			//if(it2 != m_faceNormals.end())
+			//{
+				glNormal3fv((*it2).dv);
+				++it2;
+			//}
+
 			for(int j=0;j<4;++j)
 			{
-				PointID pid = m_faces[i][j];
+				PointID pid = (*it)[j];
 				if(pid == firstPointID)
 					glVertex3fv(finalFirstPoint.v);
 				else if (pid == thirdPointID)
@@ -116,6 +173,7 @@ void Surface::mergeLastFace()
 
 	if(m_faces.size() == 0)
 		return;
+
 	PointID p1 = m_faces.back()[0];
 	PointID p2 = m_faces.back()[2];
 
@@ -125,23 +183,31 @@ void Surface::mergeLastFace()
 
 	m_points[p1] = middlePoint;
 
-	int numFaces = m_faces.size();
-	for(int i=0;i<numFaces;++i)
+	FacesList::iterator it;
+	FacesList::iterator end = m_faces.end();
+
+	for(it=m_faces.begin(); it!=end;++it)
 		for(int j=0;j<4;++j)
-			if(m_faces[i][j] == p2)
-				m_faces[i][j] = p1;
+			if((*it)[j] == p2)
+				(*it)[j] = p1;
 
 	m_edges.mergePoint(p2,p1);
 
 	m_discardedPoints.insert(p2);
 	m_faces.pop_back();
+	m_faceNormals.pop_back();
+
+	findNextMergeable();
+
+	// TODO must avoid faces to be merged if there are any adjacent faces that share 2 points not counting the merged ones 
+	// (when the 2 points are merged, they will be sharing 3 points, and thus be invalid quads
 }
 
 
 void Surface::applyLoveAndHate( float timeStep)
 {
 	int numPoints = m_points.size();
-	float love, hate, totalForce;
+	float hate;
 	geom::Vector3D qToP;
 	geom::Vector3D pToQ;
 	for(int i=0;i<numPoints;++i)
