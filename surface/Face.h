@@ -24,6 +24,14 @@ namespace surface
 				for(int i=0;i<4;++i)
 					v[i] = f.v[i];
 			}
+			
+			bool contains(PointID p) const
+			{
+				for(int i=0;i<4;++i)
+					if(v[i] == p)
+						return true;
+				return false;
+			}
 	};
 }
 #endif

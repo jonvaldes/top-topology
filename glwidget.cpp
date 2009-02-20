@@ -210,6 +210,9 @@ void GLWidget::timerEvent(QTimerEvent *)
 		try
 		{
 			m_surface.mergeLastFace();
+			emit surfacePoints(QString("").setNum(m_surface.getNumPoints()));
+			emit surfaceEdges(QString("").setNum(m_surface.getNumEdges()));
+			emit surfaceFaces(QString("").setNum(m_surface.getNumFaces()));
 		}
 		catch(surface::CannotMergeMoreException e)
 		{
@@ -221,18 +224,18 @@ void GLWidget::timerEvent(QTimerEvent *)
 		if(m_surface.getNumFaces() == 0)
 			mergeStopped = true;
 	}
-
+	float camSpeed = 0.1;//pow(m_surface.getNumEdges(),1.3f)/ m_surface.getNumPoints() / 500.0f;
 	if(m_keysStatus[KEY_W])
-		m_camera->advance(0.2);
+		m_camera->advance(camSpeed);
 
 	if(m_keysStatus[KEY_S])
-		m_camera->advance(-0.2);
+		m_camera->advance(-camSpeed);
 
 	if(m_keysStatus[KEY_A])
-		m_camera->strafeLeft(0.2);
+		m_camera->strafeLeft(camSpeed);
 
 	if(m_keysStatus[KEY_D])
-		m_camera->strafeRight(0.2);
+		m_camera->strafeRight(camSpeed);
 
 	bool cameraStopped = true;
 	for(int i=0;i<4;++i)
@@ -243,7 +246,7 @@ void GLWidget::timerEvent(QTimerEvent *)
 		}
 	if(m_mustSpherify)
 		for(int i=0;i<4;++i)
-			m_surface.applyLoveAndHate(0.01);
+			m_surface.applyLoveAndHate(0.05);
 
 	if(mergeStopped && cameraStopped && !m_mustSpherify)
 	{

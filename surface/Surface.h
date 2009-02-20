@@ -21,7 +21,7 @@ namespace surface
 			Surface();
 			void addPoint(const geom::Point3D &p);
 			void addFace(const Face &f);
-			int getNumPoints() const {return m_points.size();}
+			int getNumPoints() const {return m_points.size() - m_discardedPoints.size();}
 			int getNumFaces() const {return m_faces.size();}
 			int getNumEdges() const {return m_edges.totalEdgesCount();}
 
@@ -30,6 +30,8 @@ namespace surface
 			void mergeLastFace();
 			void applyLoveAndHate( float timeStep);
 			void findNextMergeable();
+			bool areThereOverlappingFaces(PointID p1, PointID p2) const;
+
 
 		private:
 			PointsList m_points;

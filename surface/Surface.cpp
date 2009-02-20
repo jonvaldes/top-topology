@@ -15,6 +15,22 @@ void Surface::addPoint(const geom::Point3D &p)
 	m_points.push_back(p);
 }
 
+// Checks if there are two faces that share points p1 and p2 (supposedly a diagonal)
+bool Surface::areThereOverlappingFaces(PointID p1, PointID p2) const
+{
+	FacesList::const_iterator it;
+	FacesList::const_iterator end = m_faces.end();
+	int sharingFaces = 0;
+	for(it = m_faces.begin(); it!=end; ++it)
+		if(it->contains(p1) && it->contains(p2))
+		{
+			++sharingFaces;
+			if(sharingFaces > 1)
+				return true;
+		}
+	return false;
+}
+
 void Surface::findNextMergeable()
 {
 	VectorsList::iterator itn = m_faceNormals.begin();
@@ -29,38 +45,42 @@ void Surface::findNextMergeable()
 		std::vector<PointID> p3 = m_edges.getConnectedTo((*it)[2], (*it)[1], (*it)[3]);
 		std::sort(p3.begin(),p3.end());
 
-		if(std::find_first_of(p1.begin(), p1.end(), p3.begin(),p3.end()) == p1.end()) // if 1st and 3rd share no connections
-		{
-			Face f = *it;
-			geom::Vector3D normal = *itn;
-			m_faces.erase(it);
-			m_faceNormals.erase(itn);
-			m_faces.push_back(f);
-			m_faceNormals.push_back(normal);
-			return;
-		}
+		if(!areThereOverlappingFaces((*it)[0], (*it)[2]))
+			if(std::find_first_of(p1.begin(), p1.end(), p3.begin(),p3.end()) == p1.end()) // if 1st and 3rd share no connections
+			{
+				// Tengo que buscar las caras que contienen p1, y asegurarme de que ninguna contiene tambien a p3
+
+				Face f = *it;
+				geom::Vector3D normal = *itn;
+				m_faces.erase(it);
+				m_faceNormals.erase(itn);
+				m_faces.push_back(f);
+				m_faceNormals.push_back(normal);
+				return;
+			}
+
 		std::vector<PointID> p2 = m_edges.getConnectedTo((*it)[1], (*it)[0], (*it)[2]);
 		std::sort(p2.begin(), p2.end());
 		std::vector<PointID> p4 = m_edges.getConnectedTo((*it)[3], (*it)[0], (*it)[2]);
 		std::sort(p4.begin(),p4.end());
 	
-		if(std::find_first_of(p2.begin(), p2.end(), p4.begin(),p4.end()) == p2.end()) // if 2nd and 4th share no connections
-		{
-			Face f = *it;
-			PointID p1 = f[0];
-			f[0] = f[1];
-			f[1] = f[2];
-			f[2] = f[3];
-			f[3] = p1;
+		if(!areThereOverlappingFaces((*it)[1], (*it)[3]))
+			if(std::find_first_of(p2.begin(), p2.end(), p4.begin(),p4.end()) == p2.end()) // if 2nd and 4th share no connections
+			{
+				Face f = *it;
+				PointID p1 = f[0];
+				f[0] = f[1];
+				f[1] = f[2];
+				f[2] = f[3];
+				f[3] = p1;
 
-			geom::Vector3D normal = *itn;
-			m_faces.erase(it);
-			m_faceNormals.erase(itn);
-			m_faces.push_back(f);
-			m_faceNormals.push_back(normal);
-			return;
-		}
-
+				geom::Vector3D normal = *itn;
+				m_faces.erase(it);
+				m_faceNormals.erase(itn);
+				m_faces.push_back(f);
+				m_faceNormals.push_back(normal);
+				return;
+			}
 	}
 	throw(CannotMergeMoreException());
 }
@@ -116,11 +136,8 @@ void Surface::render(float lastFaceMergingPercentage, bool showWireframe, bool s
 		VectorsList::iterator it2;
 		for(it = m_faces.begin(), it2 = m_faceNormals.begin();it!=end;++it)
 		{
-			//if(it2 != m_faceNormals.end())
-			//{
-				glNormal3fv((*it2).dv);
-				++it2;
-			//}
+			glNormal3fv((*it2).dv);
+			++it2;
 
 			for(int j=0;j<4;++j)
 			{
@@ -206,7 +223,9 @@ void Surface::mergeLastFace()
 
 void Surface::applyLoveAndHate( float timeStep)
 {
+	PointsList points = m_points;
 	int numPoints = m_points.size();
+	//int numEdges = m_edges.totalEdgesCount();
 	float hate;
 	geom::Vector3D qToP;
 	geom::Vector3D pToQ;
@@ -214,19 +233,22 @@ void Surface::applyLoveAndHate( float timeStep)
 	{
 		if(m_discardedPoints.find(i) != m_discardedPoints.end()) // if the point is among the discarded ones
 			continue;
-		geom::Point3D p = m_points[i];
+		geom::Point3D p = points[i];
 		geom::Point3D & pref = m_points[i];
 
 		std::vector<PointID> connected = m_edges.getConnectedTo(i);
 		int numConnected = connected.size();
 		for(int n=0;n<numConnected;++n)
 		{
-			const geom::Point3D & q = m_points[connected[n]];
+			const geom::Point3D & q = points[connected[n]];
 			float dist = p.distance(q);
-			if(dist < 0.05)
+			if(dist < 0.05f)
 				dist = 0.05f;
 			pToQ = q-p;
-			pref = pref + pToQ/ sqrt(dist) * 0.005f;
+			qToP = p-q;
+			float love = dist*dist * 0.01f;
+			float hate = 0.00001f/dist;
+			pref = pref + pToQ * love + qToP*hate;
 		}
 	
 
@@ -238,13 +260,13 @@ void Surface::applyLoveAndHate( float timeStep)
 				continue;
 			//if(m_discardedPoints.find(j) != m_discardedPoints.end()) // if the point is among the discarded ones
 			//	continue;
-			const geom::Point3D & q = m_points[j];
+			const geom::Point3D & q = points[j];
 			float sqDist = p.distanceSquared(q);
 			qToP = p-q;
 
-			hate = (1.0f/sqDist) * 0.005f;
+			hate = (1.5f/sqDist) /(numPoints ) /2.0f;//* numPoints);
 			pref = pref + qToP * (hate* timeStep);
 		}
-	}
 
+	}
 }
